@@ -1,0 +1,28 @@
+plugins {
+  id "com.moowork.node" version "1.3.1"
+}
+apply plugin: 'base'
+
+task packageWebapp(type: Zip) {
+    baseName 'bpmn-diff-ui'
+    extension 'jar'
+    from('app') {
+        into 'static' 
+    }
+}
+
+
+configurations {
+    npmResources
+}
+configurations.default.extendsFrom(configurations.npmResources)
+
+
+artifacts {
+    npmResources(packageWebapp.archivePath) {
+        builtBy packageWebapp
+        type "jar"
+    }
+}
+
+assemble.dependsOn(packageWebapp)

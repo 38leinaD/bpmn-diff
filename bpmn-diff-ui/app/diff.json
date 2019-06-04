@@ -1,0 +1,26 @@
+{
+  "removed": [
+    "_6-74",
+    "_6-674",
+    "_6-125",
+    "_6-178",
+    "_6-746",
+    "_6-691",
+    "_6-748"
+  ],
+  "added": [
+    "ExclusiveGateway_1",
+    "ManualTask_1"
+  ],
+  "moved": [
+    "_6-61"
+  ],
+  "edited": {
+    "_6-127": {
+      "Name": {
+        "old": "Order a pizza",
+        "new": "Order Pasta!"
+      }
+    }
+  }
+}

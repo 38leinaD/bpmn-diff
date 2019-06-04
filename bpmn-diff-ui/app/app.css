@@ -1,0 +1,223 @@
+.content {
+  height: 100%;
+  width: 100%;
+
+  position: relative;
+  display: table;
+}
+
+.di-container {
+  height: 100%;
+  width: 50%;
+  position: relative;
+
+  display: table-cell;
+  border-collapse: collapse;
+}
+
+.di-container.left {
+  border-right: dotted 2px #CCC;
+}
+
+.di-header {
+  position: absolute;
+  top: 0;
+  z-index: 10;
+  margin: 20px;
+  padding: 10px;
+
+  background: #EEE;
+  border-radius: 5px;
+
+  opacity: 0.9;
+}
+
+.di-header:hover {
+  opacity: 1;
+}
+
+.di-header h2 {
+  margin-top: 0;
+}
+
+.right .di-header {
+  right: 0;
+  text-align: right;
+}
+
+.canvas {
+  display: block;
+  height: 100%;
+}
+
+
+.djs-shape.highlight .djs-outline {
+  stroke: yellow !important;
+  stroke-width: 10px;
+  fill: yellow;
+}
+
+.djs-container {
+  overflow: hidden;
+}
+
+
+/**
+ * drag and drop
+ */
+
+.drop-marker {
+  border: dashed 5px #CCC;
+  border-radius: 20px;
+
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+}
+
+.di-container .drop-marker,
+.di-container.dropping :not(.drop-marker) {
+  display: none;
+}
+
+.dropping .drop-marker {
+  display: block;
+}
+
+/**
+ * change details
+ */
+.changeDetails table {
+  border: 2px solid orange;
+  width: 300px;
+  background-color: #fff;
+}
+
+.changeDetails th {
+  text-align: left;
+}
+
+
+/**
+ * markers
+ */
+.marker {
+  border-radius: 50%;
+  background-color: gray;
+  color: white;
+  font-weight: bold;
+  font-size: 150%;
+  padding-right: 6px;
+  padding-left: 6px;
+}
+
+.marker-changed {
+  font-size: 130%;
+  padding: 2px 5px;
+}
+
+.marker-layout-changed {
+  font-size: 120%;
+  padding: 2px 4px;
+}
+
+
+/**
+ * changes overview
+ */
+#changes-overview {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 0;
+  height: 40%;
+
+  color: #666;
+
+  padding-top: 40px;
+  z-index: 110;
+}
+
+#changes-overview.collapsed {
+  height: 45px;
+}
+
+#changes-overview .changes {
+  padding: 20px;
+  border-radius: 2px 0;
+
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#changes-overview table {
+  text-align: left;
+  width: 100%;
+  height: 100%;
+
+  border-collapse: collapse;
+}
+
+#changes-overview table tr {
+  line-height: 30px;
+}
+
+#changes-overview thead tr {
+  border-bottom: solid 1px #999;
+}
+
+#changes-overview .entry:hover {
+  background-color: #EEE;
+  cursor: pointer;
+}
+
+#changes-overview .status {
+  font-weight: bold;
+  color: #F9F9F9;
+
+  padding: 0 5px;
+  display: inline-block;
+  white-space: nowrap;
+
+  line-height: 20px
+}
+
+#changes-overview .entry.removed .status {
+  background-color: red;
+}
+
+#changes-overview .entry.added .status {
+  background-color: green;
+}
+
+#changes-overview .entry.changed .status {
+  background-color: orange;
+}
+
+#changes-overview .entry.layout-changed .status {
+  background-color: blue;
+}
+
+#changes-overview .show-hide-toggle {
+  margin: 0 0 0 auto;
+  padding: 5px 10px;
+  height: 40px;
+  cursor: pointer;
+  background: #F0F0F0;
+  display: inline-block;
+  line-height: 30px;
+
+  position: absolute;
+  right: 20px;
+  top: 0;
+
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+}
+
+#changes-overview .show-hide-toggle:hover {
+  background: #CCC;
+}

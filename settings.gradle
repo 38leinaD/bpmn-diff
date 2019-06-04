@@ -1,0 +1,4 @@
+rootProject.name = 'bpmn-diff'
+
+include 'bpmn-diff-cli'
+include 'bpmn-diff-ui'

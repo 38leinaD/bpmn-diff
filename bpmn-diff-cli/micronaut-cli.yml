@@ -1,0 +1,5 @@
+profile: cli
+defaultPackage: tracecat.cli
+---
+testFramework: junit
+sourceLanguage: java

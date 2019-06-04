@@ -1,0 +1,13 @@
+micronaut:
+  server:
+    cors:
+      enabled: true
+  application:
+    name: bpmn-diff
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /ui/**
+        paths:
+          - classpath:static
