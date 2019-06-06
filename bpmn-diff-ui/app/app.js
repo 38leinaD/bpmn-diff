@@ -1,12 +1,12 @@
-(function() {
+(function () {
 
   'use strict';
 
 
   var $ = require('jquery'),
-      _ = require('lodash'),
-      BpmnViewer = require('bpmn-js'),
-      Diffing = require('bpmn-js-diffing');
+    _ = require('lodash'),
+    BpmnViewer = require('bpmn-js'),
+    Diffing = require('bpmn-js-diffing');
 
 
   function createViewer(side) {
@@ -23,7 +23,7 @@
 
     function update(viewer) {
 
-      return function(e) {
+      return function (e) {
         if (changing) {
           return;
         }
@@ -79,7 +79,7 @@
     viewer.get('overlays').remove({ type: 'diff' });
 
     // TODO(nre): expose as external API
-    _.forEach(viewer.get('elementRegistry')._elementMap, function(container) {
+    _.forEach(viewer.get('elementRegistry')._elementMap, function (container) {
       var gfx = container.gfx;
 
       gfx
@@ -99,7 +99,7 @@
     var loaded = _.filter(viewers, isLoaded);
 
     // clear diffs on loaded
-    _.forEach(loaded, function(v) {
+    _.forEach(loaded, function (v) {
       clearDiffs(v);
     });
   }
@@ -139,7 +139,7 @@
       return viewer.importXML(diagram.xml, done);
     }
 
-    $.get(diagram.url, function(xml) {
+    $.get(diagram.url, function (xml) {
       viewer.importXML(xml, done);
     });
   }
@@ -147,22 +147,22 @@
 
   function showDiff(viewerOld, viewerNew) {
 
-    var result = Diffing.diff (viewerOld.definitions, viewerNew.definitions);
+    var result = Diffing.diff(viewerOld.definitions, viewerNew.definitions);
 
 
-    $.each(result._removed, function(i, obj) {
+    $.each(result._removed, function (i, obj) {
       highlight(viewerOld, i, 'diff-removed');
       addMarker(viewerOld, i, 'marker-removed', '&minus;');
     });
 
 
-    $.each(result._added, function(i, obj) {
+    $.each(result._added, function (i, obj) {
       highlight(viewerNew, i, 'diff-added');
       addMarker(viewerNew, i, 'marker-added', '&#43;');
     });
 
 
-    $.each(result._layoutChanged, function(i, obj) {
+    $.each(result._layoutChanged, function (i, obj) {
       highlight(viewerOld, i, 'diff-layout-changed');
       addMarker(viewerOld, i, 'marker-layout-changed', '&#8680;');
 
@@ -171,7 +171,7 @@
     });
 
 
-    $.each(result._changed, function(i, obj) {
+    $.each(result._changed, function (i, obj) {
 
       highlight(viewerOld, i, 'diff-changed');
       addMarker(viewerOld, i, 'marker-changed', '&#9998;');
@@ -180,16 +180,16 @@
       addMarker(viewerNew, i, 'marker-changed', '&#9998;');
 
       var details = '<table ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
-      $.each(obj.attrs, function(attr, changes) {
+      $.each(obj.attrs, function (attr, changes) {
         details = details + '<tr>' +
           '<td>' + attr + '</td><td>' + changes.oldValue + '</td>' +
           '<td>' + changes.newValue + '</td>' +
-        '</tr>';
+          '</tr>';
       });
 
       details = details + '</table></div>';
 
-      viewerOld.get('elementRegistry').getGraphicsByElement(i).click (function (event) {
+      viewerOld.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
         $('#changeDetailsOld_' + i).toggle();
       });
 
@@ -206,8 +206,8 @@
 
       $('#changeDetailsOld_' + i).toggle();
 
-      viewerNew.get('elementRegistry').getGraphicsByElement(i).click (function (event) {
-         $('#changeDetailsNew_' + i).toggle();
+      viewerNew.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
+        $('#changeDetailsNew_' + i).toggle();
       });
 
       var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
@@ -225,13 +225,13 @@
     });
 
     // create Table Overview of Changes
-    showChangesOverview (result, viewerOld, viewerNew);
+    showChangesOverview(result, viewerOld, viewerNew);
 
   }
 
 
-  loadDiagram('left', { url: '../resources/pizza-collaboration/old.bpmn' });
-  loadDiagram('right', { url: '../resources/pizza-collaboration/new.bpmn' });
+  loadDiagram('left', { url: '../files/0' });
+  loadDiagram('right', { url: '../files/1' });
 
 
   function openDiagram(xml, side) {
@@ -241,7 +241,7 @@
   function openFile(file, target, done) {
     var reader = new FileReader();
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       var xml = e.target.result;
       done(xml, target);
     };
@@ -250,9 +250,9 @@
   }
 
 
-  $('.drop-zone').each(function() {
+  $('.drop-zone').each(function () {
     var node = this,
-        element = $(node);
+      element = $(node);
 
     element.append('<div class="drop-marker" />');
 
@@ -291,7 +291,7 @@
     node.addEventListener('drop', handleFileSelect, false);
   });
 
-  $('.file').on('change', function(e) {
+  $('.file').on('change', function (e) {
     openFile(e.target.files[0], $(this).attr('target'), openDiagram);
   });
 
@@ -327,13 +327,13 @@
   });
 
 
-  function showChangesOverview (result, viewerOld, viewerNew) {
+  function showChangesOverview(result, viewerOld, viewerNew) {
 
     $('#changes-overview table').remove();
 
     var changesTable = $(
       '<table>' +
-        '<thead><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr></thead>' +
+      '<thead><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr></thead>' +
       '</table>');
 
     var count = 0;
@@ -341,9 +341,9 @@
     function addRow(element, type, label) {
       var html =
         '<tr class="entry">' +
-          '<td>' + (count++) + '</td><td>' + (element.name || '') + '</td>' +
-          '<td>' + element.$type.replace('bpmn:', '') + '</td>' +
-          '<td><span class="status">' + label + '</span></td>' +
+        '<td>' + (count++) + '</td><td>' + (element.name || '') + '</td>' +
+        '<td>' + element.$type.replace('bpmn:', '') + '</td>' +
+        '<td><span class="status">' + label + '</span></td>' +
         '</tr>';
 
       var row = $(html).data({
@@ -352,19 +352,19 @@
       }).addClass(type).appendTo(changesTable);
     }
 
-    $.each(result._removed, function(i, obj) {
+    $.each(result._removed, function (i, obj) {
       addRow(obj, 'removed', 'Removed');
     });
 
-    $.each(result._added, function(i, obj) {
+    $.each(result._added, function (i, obj) {
       addRow(obj, 'added', 'Added');
     });
 
-    $.each(result._changed, function(i, obj) {
+    $.each(result._changed, function (i, obj) {
       addRow(obj.model, 'changed', 'Changed');
     });
 
-    $.each(result._layoutChanged, function(i, obj) {
+    $.each(result._layoutChanged, function (i, obj) {
       addRow(obj, 'layout-changed', 'Layout Changed');
     });
 
@@ -373,14 +373,14 @@
 
     var HIGHLIGHT_CLS = 'highlight';
 
-    $('#changes-overview tr.entry').each(function() {
+    $('#changes-overview tr.entry').each(function () {
 
       var row = $(this);
 
       var id = row.data('element');
       var changed = row.data('changed');
 
-      row.hover(function() {
+      row.hover(function () {
 
         if (changed == 'removed') {
           highlight(viewerOld, id, HIGHLIGHT_CLS);
@@ -390,7 +390,7 @@
           highlight(viewerOld, id, HIGHLIGHT_CLS);
           highlight(viewerNew, id, HIGHLIGHT_CLS);
         }
-      }, function() {
+      }, function () {
 
         if (changed == 'removed') {
           unhighlight(viewerOld, id, HIGHLIGHT_CLS);
@@ -402,7 +402,7 @@
         }
       });
 
-      row.click(function() {
+      row.click(function () {
 
         var containerWidth = $('.di-container').width();
         var containerHeight = $('.di-container').height();
