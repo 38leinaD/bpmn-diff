@@ -33,7 +33,7 @@ public class UICommand implements Runnable {
 	@Option(names = { "-b", "--open-browser" }, description = "...")
 	boolean openBrowser = true;
 
-	@Parameters(arity = "1..*", paramLabel = "FILE", description = "File(s) to process.")
+	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
 	public static void main(String[] args) throws Exception {
