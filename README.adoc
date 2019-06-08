@@ -4,7 +4,7 @@ This tool is a repackaging of https://github.com/bpmn-io/bpmn-js-diffing (see he
 allowing it to be invoked from the commandline with the BPMN files to diff.
 Furthermore, this allows it to be used as a Git link:https://git-scm.com/docs/git-difftool[difftool]).
 
-image::https://gifyu.com/image/E2iE[]
+image::https://s3.gifyu.com/images/bpmn-diff.gif[]
 
 == Usage
 
