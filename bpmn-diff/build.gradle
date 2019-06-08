@@ -28,7 +28,7 @@ configurations {
 }
 
 dependencies {
-	webapp project(':bpmn-diff-ui')
+	webapp project(':bpmn-diff-webapp')
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
@@ -38,9 +38,7 @@ dependencies {
     compile "io.micronaut:micronaut-inject"
     compile "io.micronaut:micronaut-validation"
     compile 'io.micronaut:micronaut-http-client'
-    
     compile "io.micronaut:micronaut-http-server-netty"
-    
     compile "org.slf4j:slf4j-simple"
     
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"
@@ -56,9 +54,6 @@ mainClassName = "de.dplatz.bpmndiff.UICommand"
 jar {
     manifest {
         attributes 'Main-Class': mainClassName
-    }
-    from {
-    	configurations.webapp.collect { zipTree(it) }
     }
 }
 // use JUnit 5 platform

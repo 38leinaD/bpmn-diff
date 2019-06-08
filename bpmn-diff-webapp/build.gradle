@@ -4,7 +4,7 @@ plugins {
 apply plugin: 'base'
 
 task packageWebapp(type: Zip) {
-    baseName 'bpmn-diff-ui'
+    baseName 'bpmn-diff-webapp'
     extension 'jar'
     from('app') {
         into 'static' 

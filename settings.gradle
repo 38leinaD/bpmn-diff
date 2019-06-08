@@ -1,4 +1,4 @@
-rootProject.name = 'bpmn-diff'
+rootProject.name = 'bpmn-diff-root'
 
-include 'bpmn-diff-cli'
-include 'bpmn-diff-ui'
+include 'bpmn-diff'
+include 'bpmn-diff-webapp'
