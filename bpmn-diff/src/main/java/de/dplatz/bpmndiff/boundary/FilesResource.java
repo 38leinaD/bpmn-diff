@@ -26,7 +26,7 @@ public class FilesResource {
 	public List<String> files() {
 		return files;
 	}
-	
+		
 	@Get(value = "/{index}", produces = MediaType.TEXT_PLAIN)
 	public String file(Integer index) throws IOException {
 		return Files

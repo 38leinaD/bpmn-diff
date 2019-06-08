@@ -1,7 +1,12 @@
 (function () {
 
   'use strict';
-
+  
+  const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
+  const versionDiv = {
+		  left: document.querySelector("#versionLeft"),
+		  right: document.querySelector("#versionRight")
+  };
   window.addEventListener("unload", onBrowserClosed, false);
 
   function onBrowserClosed() {
@@ -139,6 +144,7 @@
     }
 
     diagramLoading(side, viewer);
+    versionDiv[side].innerText = diagram.file;
 
     if (diagram.xml) {
       return viewer.importXML(diagram.xml, done);
@@ -233,14 +239,16 @@
     showChangesOverview(result, viewerOld, viewerNew);
 
   }
+  
+  fetch(`${BACKEND_URI}/files`)
+  	.then(r => r.json())
+  	.then(files => {
+  	  loadDiagram('left', { url: BACKEND_URI + '/files/0', file: files[0] });
+  	  loadDiagram('right', { url: BACKEND_URI + '/files/1', file: files[1] });
+  	});
 
-
-  loadDiagram('left', { url: '../files/0' });
-  loadDiagram('right', { url: '../files/1' });
-
-
-  function openDiagram(xml, side) {
-    loadDiagram(side, { xml: xml });
+  function openDiagram(xml, side, file) {
+    loadDiagram(side, { xml: xml, file: file.name });
   }
 
   function openFile(file, target, done) {
@@ -248,7 +256,7 @@
 
     reader.onload = function (e) {
       var xml = e.target.result;
-      done(xml, target);
+      done(xml, target, file);
     };
 
     reader.readAsText(file);

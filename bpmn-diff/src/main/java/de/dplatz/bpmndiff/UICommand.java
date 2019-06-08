@@ -1,6 +1,5 @@
 package de.dplatz.bpmndiff;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -8,6 +7,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,9 @@ public class UICommand implements Runnable {
 	public static void main(String[] args) throws Exception {
 		PicocliRunner.run(UICommand.class, args);
 	}
+	
+	@Inject
+	SharedConfig config;
 
 	private RxHttpClient serverConnector;
 
@@ -50,8 +54,10 @@ public class UICommand implements Runnable {
 		if (openBrowser) {
 			if (!new BrowserDetection().open(webappUri)) {
 				logger.error("Unable to open browser at '" + webappUri + "'. Please open URL manually.");
-
 			}
+		}
+		else {
+			config.exitOnBeacon(false);
 		}
 	}
 
