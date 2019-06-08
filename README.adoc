@@ -25,7 +25,7 @@ java -jar bpmn-diff/build/libs/bpmn-diff.jar ./bpmn-diff-webapp/resources/pizza-
 
 A browser windows should open up showing the webapp. On close of the browser, the application should terminate.
 
-=== Git Difftool
+=== Usage as Git difftool
 
 Add the following to your `.gitconfig`
 
@@ -40,6 +40,15 @@ Assuming you have a Git repository with a BPMN-file you can compare the BPMN-fil
 ----
 git difftool -t bpmn HEAD~1 HEAD flow.bpmn
 ----
+
+== Browser Detection
+
+The tool opens the difftool/web-application in a browser. It will try to detect a browser on your system in the following way:
+
+. If the environment variable `BROWSER_COMMAND` is defined, run this with the URL of the webapp as parameter.
+. If the executable `google-chrome` is detected on your `PATH`, use this executable.
+. If the executable `firefox` is detected on your `PATH`, use this executable.
+. Else, ask the operating system to use the default browser.
 
 == Todos
 

@@ -19,18 +19,24 @@ public class BrowserDetection {
 	
 	boolean open(URI uri) {
 		
-		logger.debug("Checking for google-chrome executable...");
+		if (System.getenv("BROWSER_COMMAND") != null) {
+			String cmd = System.getenv("BROWSER_COMMAND") + " " + uri.toString();
+			logger.info("Detected BROWSER_COMMAND environment variable. Running '" + cmd + "'.");
+			return runExecutable(cmd);
+		}
+		
+		logger.debug("Checking for 'google-chrome' executable...");
 		if (isExecutableOnPath(getExecutablePath(), "google-chrome")) {
 			String cmd = "google-chrome --app=" + uri.toString();
 			logger.debug("Present! Running '" + cmd + "'.");
-			try {
-				Process p = Runtime.getRuntime().exec(cmd);
-				p.waitFor();
-				return true;
-				
-			} catch (Exception e) {
-				return false;
-			}
+			return runExecutable(cmd);
+		}
+		
+		logger.debug("Checking for 'firefox' executable...");
+		if (isExecutableOnPath(getExecutablePath(), "google-chrome")) {
+			String cmd = "firefox " + uri.toString();
+			logger.debug("Present! Running '" + cmd + "'.");
+			return runExecutable(cmd);
 		}
 		
 		// fallback
@@ -43,6 +49,17 @@ public class BrowserDetection {
 		}
 		
 		return false;
+	}
+
+	private boolean runExecutable(String cmd) {
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			p.waitFor();
+			return true;
+			
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	List<Path> getExecutablePath() {
