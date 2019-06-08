@@ -16,14 +16,9 @@ import io.micronaut.http.annotation.Put;
 @Controller("/files")
 public class FilesResource {
 	static List<String> files = new ArrayList<>();
-	static {
-		//files.add("/home/daniel/junk/bpmn/bpmn-js-diffing/resources/pizza-collaboration/old.bpmn");
-		//files.add("/home/daniel/junk/bpmn/bpmn-js-diffing/resources/pizza-collaboration/new.bpmn");
-	}
 	
 	@Put
 	public void add(Map<String, String> file) {
-		System.out.println("PUT: " + file.get("path"));
 		files.add(file.get("path"));
 	}
 	

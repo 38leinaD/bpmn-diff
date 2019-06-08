@@ -41,6 +41,8 @@ dependencies {
     
     compile "io.micronaut:micronaut-http-server-netty"
     
+    compile "org.slf4j:slf4j-simple"
+    
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"
     testCompile "org.junit.jupiter:junit-jupiter-api"
     testCompile "io.micronaut.test:micronaut-test-junit5"

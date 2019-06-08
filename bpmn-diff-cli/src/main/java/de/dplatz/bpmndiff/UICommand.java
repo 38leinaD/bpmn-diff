@@ -2,23 +2,19 @@ package de.dplatz.bpmndiff;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.inject.Inject;import org.reactivestreams.Subscriber;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.RxHttpClient;
-import io.micronaut.http.client.annotation.Client;
 import io.micronaut.runtime.server.EmbeddedServer;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -26,9 +22,6 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "ui", description = "...", mixinStandardHelpOptions = true)
 public class UICommand implements Runnable {
-
-	@Option(names = { "-v", "--verbose" }, description = "...")
-	boolean verbose;
 
 	@Option(names = { "-b", "--open-browser" }, description = "...")
 	boolean openBrowser = true;
@@ -40,53 +33,57 @@ public class UICommand implements Runnable {
 		PicocliRunner.run(UICommand.class, args);
 	}
 
-	@Client("https://api.github.com")
-    @Inject RxHttpClient client; 
-	
-	public void run() {
-		// business logic here
-		System.out.println("FIRST HELLO " + inputFiles[0]);
+	private RxHttpClient serverConnector;
 
+	public void run() {
 		EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class);
-		
+		serverConnector = createServerConnector(server);
+
+		configureServer();
+
+		URI webappUri = resolveWebapp(server);
+
+		if (openBrowser) {
+			try {
+				Desktop.getDesktop().browse(new URI(server.getURI().toString() + "/ui/index.html"));
+			} catch (Exception e) {
+				System.err.println("Unable to open the webbrowser at " + webappUri + ". Please open manually.");
+			}
+		}
+	}
+
+	private URI resolveWebapp(EmbeddedServer server) {
+		URI webappUri;
 		try {
-			RxHttpClient client = RxHttpClient.create(server.getURI().toURL());
-			Map<String, String> file = new HashMap<>();
-			file.put("path", inputFiles[0].getPath().toString());
-			HttpStatus status;
-			status = client.exchange(
-					HttpRequest.PUT("/files", file)
-					.contentType(MediaType.APPLICATION_JSON_TYPE)
-					).blockingFirst().getStatus();
-			
-			file.put("path", inputFiles[1].getPath().toString());
-			
-			status = client.exchange(
-					HttpRequest.PUT("/files", file)
-					.contentType(MediaType.APPLICATION_JSON_TYPE)
-					).blockingFirst().getStatus();
+			webappUri = new URI(server.getURI().toString() + "/ui/index.html");
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		return webappUri;
+	}
+
+	private RxHttpClient createServerConnector(EmbeddedServer server) {
+		try {
+			return RxHttpClient.create(server.getURI().toURL());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
-		
-		if (openBrowser) {
-			try {
-				Desktop.getDesktop().browse(new URI("http://localhost:8080/ui/index.html"));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			} catch (URISyntaxException e1) {
-				e1.printStackTrace();
-			}
-		}
-		System.out.println("Hi!" + server.getPort());
-		System.out.println("===================STARTED===============");
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("===================SHUTDOWN===============");
+	}
 
-		System.out.println("Bye");
+	private void configureServer() {
+		configureFile(serverConnector, inputFiles[0].toPath());
+		configureFile(serverConnector, inputFiles[1].toPath());
+
+	}
+
+	private void configureFile(RxHttpClient client, Path file) {
+		Map<String, String> obj = new HashMap<>();
+		obj.put("path", file.toString());
+		HttpStatus status = client.exchange(HttpRequest.PUT("/files", obj).contentType(MediaType.APPLICATION_JSON_TYPE))
+				.blockingFirst().getStatus();
+
+		if (status.getCode() != 200) {
+			System.err.println("Unable to configure file " + file + ". Response-code: " + status.getCode());
+		}
 	}
 }

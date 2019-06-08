@@ -2,7 +2,12 @@
 
   'use strict';
 
+  window.addEventListener("unload", onBrowserClosed, false);
 
+  function onBrowserClosed() {
+    navigator.sendBeacon("../exit", {});
+  }
+  
   var $ = require('jquery'),
     _ = require('lodash'),
     BpmnViewer = require('bpmn-js'),
