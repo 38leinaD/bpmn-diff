@@ -9,6 +9,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpRequest;
@@ -22,6 +25,7 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "ui", description = "...", mixinStandardHelpOptions = true)
 public class UICommand implements Runnable {
+	Logger logger = LoggerFactory.getLogger(UICommand.class);
 
 	@Option(names = { "-b", "--open-browser" }, description = "...")
 	boolean openBrowser = true;
@@ -44,10 +48,9 @@ public class UICommand implements Runnable {
 		URI webappUri = resolveWebapp(server);
 
 		if (openBrowser) {
-			try {
-				Desktop.getDesktop().browse(new URI(server.getURI().toString() + "/ui/index.html"));
-			} catch (Exception e) {
-				System.err.println("Unable to open the webbrowser at " + webappUri + ". Please open manually.");
+			if (!new BrowserDetection().open(webappUri)) {
+				logger.error("Unable to open browser at '" + webappUri + "'. Please open URL manually.");
+
 			}
 		}
 	}
