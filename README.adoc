@@ -4,7 +4,7 @@ This tool is a repackaging of https://github.com/bpmn-io/bpmn-js-diffing (see he
 allowing it to be invoked from the commandline.
 Furthermore, this allows it to be used as a Git link:https://git-scm.com/docs/git-difftool[difftool]).
 
-image::https://s3.gifyu.com/images/bpmn-diff.gif[]
+image::https://s3.gifyu.com/images/bpmn-diff748dbead2328ed91.gif[]
 
 == Usage
 
@@ -40,3 +40,7 @@ Assuming you have a Git repository with a BPMN-file you can compare the BPMN-fil
 ----
 git difftool -t bpmn HEAD~1 HEAD flow.bpmn
 ----
+
+== Todos
+
+* Diff folders; not just single files
