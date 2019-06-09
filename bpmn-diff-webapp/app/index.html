@@ -1,56 +1,65 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta charset="utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <link rel="stylesheet" type="text/css" href="bpmnio.css">
-  <link rel="stylesheet" type="text/css" href="diff.css">
-  <link rel="stylesheet" type="text/css" href="app.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
+	<link rel="stylesheet" type="text/css" href="bpmnio.css">
+	<link rel="stylesheet" type="text/css" href="diff.css">
+	<link rel="stylesheet" type="text/css" href="app.css">
 
-  <!--
+	<!--
     this is a BPMN 2.0 process diagram diffing example created with bpmn-js
 
     https://github.com/bpmn-io/bpmn-js-diffing
   -->
 
-  <title>BPMN-flow difftool</title>
+	<title>BPMN-flow difftool</title>
 </head>
+
 <body>
-  <div class="content">
 
-    <div class="di-container left drop-zone" target="left">
-      <div class="io-control di-header">
-        <h2 id="versionLeft">version A</h2>
-        <input class="file" type="file" target="left">
-      </div>
+	<main>
+		<nav>
+			<a-file-browser></a-file-browser>
+		</nav>
+		<article>
+			<div class="di-container left drop-zone" target="left">
 
-      <div class="canvas" id="canvas-left"></div>
-    </div>
+				<div class="io-control di-header">
+					<h2 id="versionLeft">version A</h2>
+					<input class="file" type="file" target="left">
+				</div>
 
-    <div class="di-container right drop-zone" target="right">
-      <div class="io-control di-header">
-        <h2 id="versionRight">version B</h2>
-        <input class="file" type="file" target="right">
-      </div>
+				<div class="canvas" id="canvas-left"></div>
+			</div>
 
-      <div class="canvas" id="canvas-right"></div>
-    </div>
+			<div class="di-container right drop-zone" target="right">
+				<div class="io-control di-header">
+					<h2 id="versionRight">version B</h2>
+					<input class="file" type="file" target="right">
+				</div>
 
-    <div id="changes-overview" class="collapsed">
-      <div class="io-control show-hide-toggle">List of Changes</div>
-      <div class="io-control changes"></div>
-    </div>
+				<div class="canvas" id="canvas-right"></div>
+			</div>
+		</article>
+	</main>
 
-  </div>
+	<div id="changes-overview" class="collapsed">
+		<div class="io-control show-hide-toggle">List of Changes</div>
+		<div class="io-control changes"></div>
+	</div>
 
-  <!-- viewer dependencies -->
+	<!-- viewer dependencies -->
 
-  <!-- viewer -->
-  <script src="bpmn-viewer.js"></script>
+	<!-- viewer -->
+	<script src="bpmn-viewer.js"></script>
 
-  <!-- app -->
-  <script src="app.js"></script>
+	<!-- app -->
+	<script src="app.js" type="module"></script>
 </body>
+
 </html>

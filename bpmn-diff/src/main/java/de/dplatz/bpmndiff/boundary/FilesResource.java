@@ -2,36 +2,66 @@ package de.dplatz.bpmndiff.boundary;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Singleton;
+
+import de.dplatz.bpmndiff.entity.Diff;
+import de.dplatz.bpmndiff.entity.Directory;
+import de.dplatz.bpmndiff.entity.Node;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Put;
 
-@Controller("/files")
+@Singleton
+@Controller("/diff")
 public class FilesResource {
-	static List<String> files = new ArrayList<>();
+	Path left;
+	Path right;
 	
-	@Put
-	public void add(Map<String, String> file) {
-		files.add(file.get("path"));
+	@Put(uri = "/{side}")
+	public void register(Map<String, String> file, @PathVariable String side) {
+		if (side.equals("left")) {
+			left = Paths.get(file.get("path"));
+		}
+		else {
+			right = Paths.get(file.get("path"));
+		}
 	}
-	
+/*
+	@Deprecated
 	@Get
 	public List<String> files() {
-		return files;
+		List<String> l = new LinkedList<>();
+		l.add(left.toString());
+		l.add(right.toString());
+		return l;
 	}
-		
-	@Get(value = "/{index}", produces = MediaType.TEXT_PLAIN)
-	public String file(Integer index) throws IOException {
+	*/	
+	@Get(value = "/{id}/{side}", produces = MediaType.TEXT_PLAIN)
+	public String file(String id, String side) throws IOException {
+		Diff diff= Diff.DIFF_REGISTRY.get(id);
+		Path left = diff.getLeftPath();
+		Path right = diff.getRightPath();
 		return Files
 				.readAllLines(
-						Paths.get(files.get(index)))
+						side.equals("left") ? left : right)
 				.stream().collect(Collectors.joining("\n"));
+	}
+	
+	@Get(produces = MediaType.APPLICATION_JSON)
+	public Object diff() throws IOException {
+		Node diff = Diff.ofPaths(left, right);
+		if (Directory.class.isInstance(diff)) {
+			return Directory.class.cast(diff).getChildren();
+		}
+		else {
+			return diff;
+		}
 	}
 }

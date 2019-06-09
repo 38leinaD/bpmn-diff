@@ -80,15 +80,15 @@ public class UICommand implements Runnable {
 	}
 
 	private void configureServer() {
-		configureFile(serverConnector, inputFiles[0].toPath());
-		configureFile(serverConnector, inputFiles[1].toPath());
+		configureFile(serverConnector, inputFiles[0].toPath(), "left");
+		configureFile(serverConnector, inputFiles[1].toPath(), "right");
 
 	}
 
-	private void configureFile(RxHttpClient client, Path file) {
+	private void configureFile(RxHttpClient client, Path file, String side) {
 		Map<String, String> obj = new HashMap<>();
 		obj.put("path", file.toString());
-		HttpStatus status = client.exchange(HttpRequest.PUT("/files", obj).contentType(MediaType.APPLICATION_JSON_TYPE))
+		HttpStatus status = client.exchange(HttpRequest.PUT("/diff/" + side, obj).contentType(MediaType.APPLICATION_JSON_TYPE))
 				.blockingFirst().getStatus();
 
 		if (status.getCode() != 200) {

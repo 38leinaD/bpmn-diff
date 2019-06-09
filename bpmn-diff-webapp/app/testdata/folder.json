@@ -1,0 +1,55 @@
+[
+  {
+    "fullName": "./bpmn-diff-webapp/resources/simple/a.bpmn",
+    "name": "old.bpmn"
+  },
+    {
+    "fullName": "./bpmn-diff-webapp/resources/simple/v.bpmn",
+    "name": "old.bpmn"
+  },
+  {
+    "fullName": "./bpmn-diff-webapp/resources/simple",
+    "name": "simple",
+    "children": [
+      {
+        "fullName": "./bpmn-diff-webapp/resources/simple/new.bpmn",
+        "name": "new.bpmn"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/simple/diff.json",
+        "name": "diff.json"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/simple/old.bpmn",
+        "name": "old.bpmn"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/simple/new_removed.bpmn",
+        "name": "new_removed.bpmn"
+      }
+    ]
+  },
+  {
+    "fullName": "./bpmn-diff-webapp/resources/pizza-collaboration",
+    "name": "pizza-collaboration",
+    "children": [
+      {
+        "fullName": "./bpmn-diff-webapp/resources/pizza-collaboration/start-event-old.bpmn",
+        "name": "start-event-old.bpmn"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/pizza-collaboration/start-event-new.bpmn",
+        "name": "start-event-new.bpmn"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn",
+        "name": "new.bpmn"
+      },
+      {
+        "fullName": "./bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn",
+        "name": "old.bpmn"
+      }
+    ]
+  }
+]
+
