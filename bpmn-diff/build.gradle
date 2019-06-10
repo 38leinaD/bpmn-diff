@@ -59,6 +59,9 @@ jar {
 // use JUnit 5 platform
 test {
     useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
 }
 tasks.withType(JavaCompile){
     options.encoding = "UTF-8"

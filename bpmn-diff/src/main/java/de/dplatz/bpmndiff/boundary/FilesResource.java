@@ -27,10 +27,10 @@ public class FilesResource {
 	@Put(uri = "/{side}")
 	public void register(Map<String, String> file, @PathVariable String side) {
 		if (side.equals("left")) {
-			left = Paths.get(file.get("path"));
+			left = Paths.get(file.get("path")).normalize();
 		}
 		else {
-			right = Paths.get(file.get("path"));
+			right = Paths.get(file.get("path")).normalize();
 		}
 	}
 /*
@@ -56,6 +56,7 @@ public class FilesResource {
 	
 	@Get(produces = MediaType.APPLICATION_JSON)
 	public Object diff() throws IOException {
+		System.out.println("@@@@@@@@@@@@@CALLED");
 		Node diff = Diff.ofPaths(left, right);
 		if (Directory.class.isInstance(diff)) {
 			return Directory.class.cast(diff).getChildren();

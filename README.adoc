@@ -1,5 +1,7 @@
 = BPMN difftool for Git
 
+image::https://api.travis-ci.org/38leinaD/bpmn-diff.svg[]
+
 This tool is a repackaging of https://github.com/bpmn-io/bpmn-js-diffing (see here for the link:https://demo.bpmn.io/diff[online version])
 allowing it to be invoked from the commandline.
 Furthermore, this allows it to be used as a Git link:https://git-scm.com/docs/git-difftool[difftool].

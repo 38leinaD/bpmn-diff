@@ -3,8 +3,12 @@ package de.dplatz.bpmndiff.entity;
 import java.nio.file.Path;
 
 public class Node implements Comparable<Node> {
-	private final Path leftPath, rightPath;
+	private Path leftPath, rightPath;
 
+	public Node() {
+		super();
+	}
+	
 	public Node(Path left, Path right) {
 		super();
 		this.leftPath = left;

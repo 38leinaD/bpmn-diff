@@ -10,16 +10,20 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Diff extends Node {
-	enum Type {
+	public enum Type {
 		Added,
 		Removed,
 		Modified
 	}
 	
+	public Diff() {
+		super();
+	}
+
 	public static Map<String, Diff> DIFF_REGISTRY = new HashMap<String, Diff>();
 	
-	private final Type type;
-	private final String id;
+	private Type type;
+	private String id;
 	private Diff(Path left, Path right, Type type) {
 		super(left, right);
 		this.type = type;
