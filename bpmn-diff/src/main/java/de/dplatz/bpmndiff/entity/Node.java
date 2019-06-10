@@ -24,10 +24,12 @@ public class Node implements Comparable<Node> {
 	}
 	
 	public String getLeftName() {
+		if (leftPath == null) return null;
 		return leftPath.getFileName().toString();
 	}
 
 	public String getRightName() {
+		if (rightPath == null) return null;
 		return rightPath.getFileName().toString();
 	}
 	

@@ -24,6 +24,7 @@ nav {
 	grid-area: nav;
   background-color: #EEE;
   box-shadow: 6px 0 6px rgba(0,0,0,.1);
+  padding: 1em;
 }
 
 main.collapsedNav > nav {
@@ -92,10 +93,22 @@ article {
  * file browser
  */
 
- li.selected, li.selected > a {
-  color: #52b416;
+li.selected, li.selected > a {
   font-weight: bold;
- }
+}
+
+a.file.Added {
+  color: green;
+}
+
+a.file.Removed {
+  color: red;
+  text-decoration: line-through;
+}
+
+a.file.Modified {
+  color: blue;
+}
 
 /**
  * drag and drop

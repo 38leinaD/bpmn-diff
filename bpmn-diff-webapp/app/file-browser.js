@@ -2,6 +2,7 @@ export default class FileBrowser extends HTMLElement {
     connectedCallback() {
         //this.root = this.attachShadow({mode: 'open'});
         this.selectedFileDomNode = null;
+        this.innerHTML = `<h2>Files</h2>`;
     }
 
     ls(files) {
@@ -44,7 +45,7 @@ export default class FileBrowser extends HTMLElement {
             li.id = file.id;
         }
         li.file = file;
-        li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#">${file.leftName}</a>`;
+        li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${file.type}">${file.type == "Removed" ? file.leftName : file.rightName}</a>`;
         li.querySelector('a').onclick = e => {
             const li = e.target.parentElement;
             if (li.id == "") return false;

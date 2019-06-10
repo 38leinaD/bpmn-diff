@@ -20,7 +20,7 @@ import io.micronaut.http.annotation.Put;
 
 @Singleton
 @Controller("/diff")
-public class FilesResource {
+public class DiffResource {
 	Path left;
 	Path right;
 	
@@ -56,7 +56,6 @@ public class FilesResource {
 	
 	@Get(produces = MediaType.APPLICATION_JSON)
 	public Object diff() throws IOException {
-		System.out.println("@@@@@@@@@@@@@CALLED");
 		Node diff = Diff.ofPaths(left, right);
 		if (Directory.class.isInstance(diff)) {
 			return Directory.class.cast(diff).getChildren();

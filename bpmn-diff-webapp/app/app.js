@@ -463,8 +463,12 @@ function main() {
 
           fileBrowser.addEventListener("file-selected", e => {
             const diff = e.detail;
-            loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
-            loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
+            if (diff.type == "Removed" || diff.type == "Modified") {
+              loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
+            }
+            if (diff.type == "Added" || diff.type == "Modified") {
+              loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
+            }
           });
 
           fileBrowser.ls(diff);
