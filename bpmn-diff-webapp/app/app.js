@@ -2,7 +2,6 @@ import FileBrowser from './file-browser.js'
 //import BpmnViewer from 'https://unpkg.com/bpmn-js@3.4.3/lib/Viewer.js?module'
 import BpmnViewer from 'bpmn-js/lib/NavigatedViewer.js'
 import diff from './lib/differ.js'
-import _ from 'lodash';
 import $ from 'jquery';
 
 const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
@@ -80,7 +79,7 @@ function isLoaded(v) {
 }
 
 function allDiagramsLoaded() {
-  return _.every(viewers, isLoaded);
+  return isLoaded(viewers['left']) && isLoaded(viewers['right']);
 }
 
 function setLoading(viewer, loading) {
@@ -91,8 +90,7 @@ function setLoading(viewer, loading) {
 function clearDiffs(viewer) {
   viewer.get('overlays').remove({ type: 'diff' });
 
-  // TODO(nre): expose as external API
-  _.forEach(viewer.get('elementRegistry').getAll(), function (container) {
+  viewer.get('elementRegistry').getAll().forEach(function (container) {
     var gfx = viewer.get('elementRegistry').getGraphics(container.id);
 
     gfx.classList.remove('diff-added');
@@ -107,11 +105,12 @@ function clearDiffs(viewer) {
 function diagramLoading(side, viewer) {
 
   setLoading(viewer, true);
-
-  var loaded = _.filter(viewers, isLoaded);
+  var loaded = [];
+  if (isLoaded(viewers['left'])) loaded.push(viewers['left']);
+  if (isLoaded(viewers['right'])) loaded.push(viewers['right']);
 
   // clear diffs on loaded
-  _.forEach(loaded, function (v) {
+  loaded.forEach(function (v) {
     clearDiffs(v);
   });
 }

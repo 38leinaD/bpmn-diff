@@ -3,3 +3,4 @@
 *.jar
 node_modules
 web_modules
+/cypress

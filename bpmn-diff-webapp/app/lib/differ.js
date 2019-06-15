@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { create } from 'jsondiffpatch';
 import ChangeHandler from './change-handler';
 
@@ -25,42 +24,50 @@ Differ.prototype.diff = function(a, b, handler) {
 
   function walk(diff, model) {
 
-    _.forEach(diff, function(d, key) {
+    for (const key in diff) {
+      if (diff.hasOwnProperty(key)) {
+        const d = diff[key]
 
-      // is array
-      if (d._t === 'a') {
+              // is array
+        if (d._t === 'a') {
 
-        _.forEach(d, function(val, idx) {
+          for (let idx in d) {
+            if (d.hasOwnProperty(idx)) {
+              const val = d[idx];
 
-          if (idx === '_t') {
-            return;
+              if (idx === '_t') {
+                continue;
+              }
+
+              var removed = /^_/.test(idx),
+                  added = !removed && Array.isArray(val),
+                  moved = removed && val[0] === '';
+
+              idx = parseInt(removed ? idx.slice(1) : idx, 10);
+
+              if (added || (removed && !moved)) {
+                handler[removed ? 'removed' : 'added'](model, key, val[0], idx);
+              }
+              else if (moved) {
+                handler.moved(model, key, val[1], val[2]);
+              }
+              else {
+                walk(val, model[key][idx]);
+              }
+            }
           }
-
-          var removed = /^_/.test(idx),
-              added = !removed && _.isArray(val),
-              moved = removed && val[0] === '';
-
-          idx = parseInt(removed ? idx.slice(1) : idx, 10);
-
-          if (added || (removed && !moved)) {
-            handler[removed ? 'removed' : 'added'](model, key, val[0], idx);
-          } else
-          if (moved) {
-            handler.moved(model, key, val[1], val[2]);
-          } else {
-            walk(val, model[key][idx]);
-          }
-        });
-      } else {
-        if (_.isArray(d)) {
-          handler.changed(model, key, d[0], d[1]);
         } else {
-          handler.changed(model, key);
-          walk(d, model[key]);
+          if (Array.isArray(d)) {
+            handler.changed(model, key, d[0], d[1]);
+          } else {
+            handler.changed(model, key);
+            walk(d, model[key]);
+          }
         }
       }
-    });
-  }
+    }
+  };
+
 
   var diff = this.createDiff(a, b);
 
