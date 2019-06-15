@@ -1,4 +1,8 @@
 export default class FileBrowser extends HTMLElement {
+    static get observedAttributes() {
+        return ['collapseEmpty'];
+    }
+
     connectedCallback() {
         //this.root = this.attachShadow({mode: 'open'});
         this.selectedFileDomNode = null;
@@ -7,6 +11,9 @@ export default class FileBrowser extends HTMLElement {
 
     ls(files) {
         this.renderFiles(files, this);
+
+        //const hr = document.createElement('hr');
+        //this.appendChild(hr);
     }
 
     select(selectedFile) {
@@ -29,23 +36,44 @@ export default class FileBrowser extends HTMLElement {
     renderFiles(files, parent) {
         const ul = document.createElement('ul');
         ul.classList.add('fa-ul');
+        
         for (const file of files) {
             this.renderFile(file, ul);
         }
         parent.appendChild(ul);
     }
 
+    isDirectory(f) {
+        return f.children != null;
+    }
+
+    resolveNameOfFile(file) {
+        if (file.type == "Removed") {
+            return file.leftName;
+        }
+        else {
+            return file.rightName;
+        }
+    }
+
     renderFile(file, parent) {
 
-        const isDirectory = file.children != null;
-        const icon = isDirectory ? 'fa-folder' : 'fa-file';
+        let tip = file;
+        let collapsedPath = this.resolveNameOfFile(tip);
+        while (this.collapseEmpty && this.isDirectory(tip) && tip.children != null && tip.children.length == 1) {
+            tip = tip.children[0];
+            collapsedPath += `/${this.resolveNameOfFile(tip)}`;
+        }
+
         // file
         const li = document.createElement('li');
-        if (!isDirectory) {
-            li.id = file.id;
+        if (!this.isDirectory(tip)) {
+            li.id = tip.id;
         }
-        li.file = file;
-        li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${file.type}">${file.type == "Removed" ? file.leftName : file.rightName}</a>`;
+        const icon = this.isDirectory(tip) ? 'fa-folder' : 'fa-file';
+
+        li.file = tip;
+        li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a>`;
         li.querySelector('a').onclick = e => {
             const li = e.target.parentElement;
             if (li.id == "") return false;
@@ -56,13 +84,20 @@ export default class FileBrowser extends HTMLElement {
         parent.appendChild(li);
 
 
-        if (isDirectory) {
+        if (this.isDirectory(tip)) {
             // folder
-            this.renderFiles(file.children, li);
+            this.renderFiles(tip.children, li);
         }
         
     }
 
+    get collapseEmpty() {
+        return this.getAttribute('collapseEmpty') == 'true';
+    }
+
+    attributeChangedCallback(attributeName, oldValue, newValue) {
+        //console.log("@@@@@ " + attributeName + ": " + newValue)
+    }
 }
 
 customElements.define('a-file-browser', FileBrowser);
