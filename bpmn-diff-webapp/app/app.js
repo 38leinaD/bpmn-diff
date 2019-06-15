@@ -1,4 +1,9 @@
 import FileBrowser from './file-browser.js'
+//import BpmnViewer from 'https://unpkg.com/bpmn-js@3.4.3/lib/Viewer.js?module'
+import BpmnViewer from 'bpmn-js/lib/NavigatedViewer.js'
+import diff from './lib/differ.js'
+import _ from 'lodash';
+import $ from 'jquery';
 
 const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
 const versionDiv = {
@@ -11,12 +16,6 @@ function onBrowserClosed() {
   navigator.sendBeacon("../exit", {});
 }
 
-var $ = require('jquery'),
-  _ = require('lodash'),
-  BpmnViewer = require('bpmn-js'),
-  Diffing = require('bpmn-js-diffing');
-
-
 function createViewer(side) {
   return new BpmnViewer({
     container: '#canvas-' + side,
@@ -25,25 +24,27 @@ function createViewer(side) {
   });
 }
 
+var changing;
+
+function syncNowFn(movedViewer, viewer) {
+
+  return function (e) {
+    if (changing) {
+      return;
+    }
+
+    changing = true;
+    viewer.get('canvas').viewbox(movedViewer.get('canvas').viewbox());
+    changing = false;
+  };
+}
+
 function syncViewers(a, b) {
 
-  var changing;
-
-  function update(viewer) {
-
-    return function (e) {
-      if (changing) {
-        return;
-      }
-
-      changing = true;
-      viewer.get('canvas').viewbox(e.viewbox);
-      changing = false;
-    };
-  }
+  
 
   function syncViewbox(a, b) {
-    a.on('canvas.viewbox.changed', update(b));
+    a.on('canvas.viewbox.changing', syncNowFn(a, b));
   }
 
   syncViewbox(a, b);
@@ -70,6 +71,10 @@ function getViewer(side) {
   return viewers[side];
 }
 
+function getOtherViewer(viewer) {
+  return getViewer('left') == viewer ? getViewer('right') : getViewer('left');
+}
+
 function isLoaded(v) {
   return v.loading !== undefined && !v.loading;
 }
@@ -87,14 +92,13 @@ function clearDiffs(viewer) {
   viewer.get('overlays').remove({ type: 'diff' });
 
   // TODO(nre): expose as external API
-  _.forEach(viewer.get('elementRegistry')._elementMap, function (container) {
-    var gfx = container.gfx;
+  _.forEach(viewer.get('elementRegistry').getAll(), function (container) {
+    var gfx = viewer.get('elementRegistry').getGraphics(container.id);
 
-    gfx
-      .removeClass('diff-added')
-      .removeClass('diff-changed')
-      .removeClass('diff-removed')
-      .removeClass('diff-layout-changed');
+    gfx.classList.remove('diff-added');
+    gfx.classList.remove('diff-changed');
+    gfx.classList.remove('diff-removed');
+    gfx.classList.remove('diff-layout-changed');
   });
 
 }
@@ -118,8 +122,7 @@ function diagramLoaded(err, side, viewer) {
     alert("Error loading BPMN-flow. " + err)
   }
 
-  setLoading(viewer, err);
-
+  setLoading(viewer, err ? err : false);
   if (allDiagramsLoaded()) {
 
     // sync viewboxes
@@ -157,8 +160,7 @@ function loadDiagram(side, diagram) {
 
 function showDiff(viewerOld, viewerNew) {
 
-  var result = Diffing.diff(viewerOld.definitions, viewerNew.definitions);
-
+  var result = diff(viewerOld._definitions, viewerNew._definitions);
 
   $.each(result._removed, function (i, obj) {
     highlight(viewerOld, i, 'diff-removed');
@@ -199,9 +201,9 @@ function showDiff(viewerOld, viewerNew) {
 
     details = details + '</table></div>';
 
-    viewerOld.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
+    viewerOld.get('elementRegistry').getGraphics(i).onclick = function (event) {
       $('#changeDetailsOld_' + i).toggle();
-    });
+    };
 
     var detailsOld = '<div id="changeDetailsOld_' + i + '" class="changeDetails">' + details;
 
@@ -216,9 +218,9 @@ function showDiff(viewerOld, viewerNew) {
 
     $('#changeDetailsOld_' + i).toggle();
 
-    viewerNew.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
+    viewerNew.get('elementRegistry').getGraphics(i).onclick = function (event) {
       $('#changeDetailsNew_' + i).toggle();
-    });
+    };
 
     var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
 
@@ -414,7 +416,7 @@ function showChangesOverview(result, viewerOld, viewerNew) {
 
       var viewer = (changed == 'removed' ? viewerOld : viewerNew);
 
-      var element = viewer.get('elementRegistry').getById(id);
+      var element = viewer.get('elementRegistry').get(id);
 
       var x, y;
 
@@ -432,6 +434,7 @@ function showChangesOverview(result, viewerOld, viewerNew) {
         width: containerWidth,
         height: containerHeight
       });
+      syncNowFn(viewer, getOtherViewer(viewer))();
     });
 
   });

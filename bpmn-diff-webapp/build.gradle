@@ -6,11 +6,16 @@ apply plugin: 'base'
 task packageWebapp(type: Zip) {
     baseName 'bpmn-diff-webapp'
     extension 'jar'
-    from('app') {
+    from('dist') {
         into 'static' 
     }
 }
 
+task bundleWebApp(type:Exec) {
+    commandLine './bundle.sh'
+}
+
+packageWebapp.dependsOn bundleWebApp
 
 configurations {
     npmResources
