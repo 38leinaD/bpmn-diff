@@ -18,7 +18,6 @@
   "homepage": "https://github.com/38leinaD/bpmn-diff#readme",
   "dependencies": {
     "bpmn-js": "^3.4.1",
-    "jquery": "^3.4.1",
     "jsondiffpatch": "^0.3.11"
   },
   "devDependencies": {
