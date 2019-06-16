@@ -1,6 +1,7 @@
 package de.dplatz.bpmndiff.entity;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,7 +10,22 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+
 public class Diff extends Node {
+	
+	Logger logger = LoggerFactory.getLogger(Diff.class);
+
+	
 	public enum Type {
 		Added,
 		Removed,
@@ -24,27 +40,15 @@ public class Diff extends Node {
 	
 	private Type type;
 	private String id;
+	private boolean supported;
+	
 	private Diff(Path left, Path right, Type type) {
 		super(left, right);
 		this.type = type;
 		this.id = UUID.randomUUID().toString();
 		DIFF_REGISTRY.put(this.id, this);
 	}
-		
-	public static Diff ofFiles(Path left, Path right) {
-		if (!isDir(left, right)) {
-			Type type = Type.Modified;
-			if (left == null) type = Type.Added;
-			if (right == null) type = Type.Removed;
-			Diff diff = new Diff(left, right, type);
-			
-			return diff;
-		}
-		else {
-			throw new AssertionError("Not a file. " + left + "," + right);
-		}
-	}
-	
+
 	public static Node ofPaths(Path left, Path right) {
 		if (isDir(left, right)) {
 			
@@ -87,6 +91,8 @@ public class Diff extends Node {
 			if (right == null) type = Type.Removed;
 			Diff diff = new Diff(left, right, type);
 			
+			diff.determineIfSupported();
+			
 			return diff;
 		}
 	}
@@ -101,6 +107,37 @@ public class Diff extends Node {
 	public static boolean isDir(Path left, Path right) {
 		return (left != null && left.toFile().isDirectory()) || (right != null && right.toFile().isDirectory());
 	}
+	
+	private void determineIfSupported() {
+		supported = this.isValidXmlFile(this.getLeftPath()) || this.isValidXmlFile(this.getRightPath());
+	}
+	
+	private boolean isValidXmlFile(Path p) {
+
+		try {
+			if (p == null) return false;
+			if (!p.toFile().exists()) return false;
+			
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setValidating(false);
+			factory.setNamespaceAware(true);
+	
+			SAXParser parser = factory.newSAXParser();
+	
+			XMLReader reader = parser.getXMLReader();
+			reader.parse(new InputSource(new FileInputStream(p.toFile())));
+			
+			return true;
+		}
+		catch (SAXParseException spe) {
+			return false;
+		}
+		catch (Exception e) {
+			// TODO: these errors should probably be forwarded to the UI and displayed instead of printed to the log.
+			logger.error(String.format("Error while determining if file (%s) is a valid BPMN-file.",  p.getFileName().toString()), e);
+			return false;
+		}
+	}
 
 	public Type getType() {
 		return type;
@@ -108,5 +145,9 @@ public class Diff extends Node {
 
 	public String getId() {
 		return id;
+	}
+
+	public boolean isSupported() {
+		return supported;
 	}
 }

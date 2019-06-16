@@ -1,23 +1,20 @@
 package de.dplatz.bpmndiff;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.dplatz.bpmndiff.boundary.DiffResource;
+import de.dplatz.bpmndiff.entity.Diff;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.runtime.server.EmbeddedServer;
 import picocli.CommandLine.Command;
@@ -37,9 +34,9 @@ public class UICommand implements Runnable {
 	public static void main(String[] args) throws Exception {
 		PicocliRunner.run(UICommand.class, args);
 	}
-	
+		
 	@Inject
-	SharedConfig config;
+	DiffResource differ;
 
 	private RxHttpClient serverConnector;
 
@@ -49,6 +46,22 @@ public class UICommand implements Runnable {
 
 		configureServer();
 
+		try {
+			Object diff = differ.diff();
+			
+			if (diff instanceof Diff) {
+				Diff fileDiff = Diff.class.cast(diff);
+				if (!fileDiff.isSupported()) {
+					logger.info(String.format("File-diff on unsupported file %s. Exiting.", fileDiff.toString()));
+					System.exit(-1);
+				}
+			}
+			
+		} catch (IOException e) {
+			logger.error("Error while diffing.", e);
+			System.exit(-1);
+		}
+		
 		URI webappUri = resolveWebapp(server);
 
 		if (openBrowser) {
@@ -57,7 +70,7 @@ public class UICommand implements Runnable {
 			}
 		}
 		else {
-			config.exitOnBeacon(false);
+			SharedConfig.getInstance().exitOnBeacon(false);
 		}
 	}
 
@@ -80,19 +93,7 @@ public class UICommand implements Runnable {
 	}
 
 	private void configureServer() {
-		configureFile(serverConnector, inputFiles[0].toPath(), "left");
-		configureFile(serverConnector, inputFiles[1].toPath(), "right");
-
-	}
-
-	private void configureFile(RxHttpClient client, Path file, String side) {
-		Map<String, String> obj = new HashMap<>();
-		obj.put("path", file.toString());
-		HttpStatus status = client.exchange(HttpRequest.PUT("/diff/" + side, obj).contentType(MediaType.APPLICATION_JSON_TYPE))
-				.blockingFirst().getStatus();
-
-		if (status.getCode() != 200) {
-			System.err.println("Unable to configure file " + file + ". Response-code: " + status.getCode());
-		}
+		SharedConfig.getInstance().setLeft(inputFiles[0].toPath());
+		SharedConfig.getInstance().setRight(inputFiles[1].toPath());
 	}
 }

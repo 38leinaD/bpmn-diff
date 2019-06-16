@@ -73,20 +73,30 @@ export default class FileBrowser extends HTMLElement {
         const icon = this.isDirectory(tip) ? 'fa-folder' : 'fa-file';
 
         li.file = tip;
-        li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a>`;
-        li.querySelector('a').onclick = e => {
-            const li = e.target.parentElement;
-            if (li.id == "") return false;
-            this._selectById(li.id);
-            return false;
-        }
-
-        parent.appendChild(li);
-
 
         if (this.isDirectory(tip)) {
             // folder
+
+            li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a>`;
+            parent.appendChild(li);
+
             this.renderFiles(tip.children, li);
+        }
+        else if (!tip.supported) {
+            li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a> (unknown format)`;
+            parent.appendChild(li);
+        }
+        else {
+            // file
+            li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a>`;
+            li.querySelector('a').onclick = e => {
+                const li = e.target.parentElement;
+                if (li.id == "") return false;
+                this._selectById(li.id);
+                return false;
+            }
+
+            parent.appendChild(li);
         }
         
     }

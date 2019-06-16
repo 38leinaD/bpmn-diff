@@ -28,7 +28,9 @@ configurations {
 }
 
 dependencies {
-	webapp project(':bpmn-diff-webapp')
+	if (!project.hasProperty('hollow')) {
+		webapp project(':bpmn-diff-webapp')
+	}
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"

@@ -6,11 +6,10 @@ import java.nio.file.Paths;
 
 import javax.inject.Inject;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import de.dplatz.bpmndiff.control.Differ;
 import de.dplatz.bpmndiff.entity.Diff;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.annotation.MicronautTest;
@@ -22,21 +21,34 @@ public class FileDiffTest {
     @Client("/diff")
     RxHttpClient client; 
 	
+	@Inject
+	Differ differ;
+	
 	@Test
-	void testit() {
-		Assertions.assertEquals(client.exchange(HttpRequest.PUT("/left", "{ \"path\": \"./src/test/resources/diffs/file-diff/a/flow.bpmn\" }"))
-			.blockingFirst()
-			.getStatus()
-			.getCode(), 200);
-		Assertions.assertEquals(client.exchange(HttpRequest.PUT("/right", "{ \"path\": \"./src/test/resources/diffs/file-diff/b/flow.bpmn\" }"))
-				.blockingFirst()
-				.getStatus()
-				.getCode(), 200);
+	void should_diff_bpmn_files() {
 
+		// TODO
+		differ.reset();
+		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn"));
+		SharedConfig.getInstance().setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn"));
+		
 		Diff diff = client.toBlocking().retrieve("/", Diff.class);
 
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn").toAbsolutePath().normalize(), diff.getLeftPath());
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn").toAbsolutePath().normalize(), diff.getRightPath());
-		assertEquals(diff.getType(), Diff.Type.Modified);
+		assertEquals(true, diff.isSupported());
+
+		assertEquals(Diff.Type.Modified, diff.getType());
+	}
+	
+	@Test
+	void should_should_not_support_text_files() {
+		differ.reset();
+		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt"));
+		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt"));
+		
+		Diff diff = client.toBlocking().retrieve("/", Diff.class);
+		
+		assertEquals(false, diff.isSupported());
 	}
 }

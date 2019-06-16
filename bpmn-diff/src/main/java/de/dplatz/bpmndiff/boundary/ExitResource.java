@@ -10,12 +10,9 @@ import io.micronaut.http.annotation.Post;
 @Controller("/exit")
 public class ExitResource {
 	
-	@Inject
-	SharedConfig config;
-	
 	@Post
 	@Consumes("text/plain")
 	public void exit() {
-		if (config.shouldExitOnBeacon()) System.exit(0);
+		if (SharedConfig.getInstance().shouldExitOnBeacon()) System.exit(0);
 	}
 }
