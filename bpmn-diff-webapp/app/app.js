@@ -1,4 +1,7 @@
 import FileBrowser from './file-browser.js'
+//import BpmnViewer from 'https://unpkg.com/bpmn-js@3.4.3/lib/Viewer.js?module'
+import BpmnViewer from 'bpmn-js/lib/NavigatedViewer.js'
+import diff from './lib/differ.js'
 
 const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
 const versionDiv = {
@@ -11,12 +14,6 @@ function onBrowserClosed() {
   navigator.sendBeacon("../exit", {});
 }
 
-var $ = require('jquery'),
-  _ = require('lodash'),
-  BpmnViewer = require('bpmn-js'),
-  Diffing = require('bpmn-js-diffing');
-
-
 function createViewer(side) {
   return new BpmnViewer({
     container: '#canvas-' + side,
@@ -25,25 +22,27 @@ function createViewer(side) {
   });
 }
 
+var changing;
+
+function syncNowFn(movedViewer, viewer) {
+
+  return function (e) {
+    if (changing) {
+      return;
+    }
+
+    changing = true;
+    viewer.get('canvas').viewbox(movedViewer.get('canvas').viewbox());
+    changing = false;
+  };
+}
+
 function syncViewers(a, b) {
 
-  var changing;
-
-  function update(viewer) {
-
-    return function (e) {
-      if (changing) {
-        return;
-      }
-
-      changing = true;
-      viewer.get('canvas').viewbox(e.viewbox);
-      changing = false;
-    };
-  }
+  
 
   function syncViewbox(a, b) {
-    a.on('canvas.viewbox.changed', update(b));
+    a.on('canvas.viewbox.changing', syncNowFn(a, b));
   }
 
   syncViewbox(a, b);
@@ -70,12 +69,16 @@ function getViewer(side) {
   return viewers[side];
 }
 
+function getOtherViewer(viewer) {
+  return getViewer('left') == viewer ? getViewer('right') : getViewer('left');
+}
+
 function isLoaded(v) {
   return v.loading !== undefined && !v.loading;
 }
 
 function allDiagramsLoaded() {
-  return _.every(viewers, isLoaded);
+  return isLoaded(viewers['left']) && isLoaded(viewers['right']);
 }
 
 function setLoading(viewer, loading) {
@@ -86,15 +89,13 @@ function setLoading(viewer, loading) {
 function clearDiffs(viewer) {
   viewer.get('overlays').remove({ type: 'diff' });
 
-  // TODO(nre): expose as external API
-  _.forEach(viewer.get('elementRegistry')._elementMap, function (container) {
-    var gfx = container.gfx;
+  viewer.get('elementRegistry').getAll().forEach(function (container) {
+    var gfx = viewer.get('elementRegistry').getGraphics(container.id);
 
-    gfx
-      .removeClass('diff-added')
-      .removeClass('diff-changed')
-      .removeClass('diff-removed')
-      .removeClass('diff-layout-changed');
+    gfx.classList.remove('diff-added');
+    gfx.classList.remove('diff-changed');
+    gfx.classList.remove('diff-removed');
+    gfx.classList.remove('diff-layout-changed');
   });
 
 }
@@ -103,11 +104,12 @@ function clearDiffs(viewer) {
 function diagramLoading(side, viewer) {
 
   setLoading(viewer, true);
-
-  var loaded = _.filter(viewers, isLoaded);
+  var loaded = [];
+  if (isLoaded(viewers['left'])) loaded.push(viewers['left']);
+  if (isLoaded(viewers['right'])) loaded.push(viewers['right']);
 
   // clear diffs on loaded
-  _.forEach(loaded, function (v) {
+  loaded.forEach(function (v) {
     clearDiffs(v);
   });
 }
@@ -118,8 +120,7 @@ function diagramLoaded(err, side, viewer) {
     alert("Error loading BPMN-flow. " + err)
   }
 
-  setLoading(viewer, err);
-
+  setLoading(viewer, err ? err : false);
   if (allDiagramsLoaded()) {
 
     // sync viewboxes
@@ -129,10 +130,6 @@ function diagramLoaded(err, side, viewer) {
     showDiff(getViewer('left'), getViewer('right'));
   }
 }
-
-
-// we use $.ajax to load the diagram.
-// make sure you run the application via web-server (ie. connect (node) or asdf (ruby))
 
 function loadDiagram(side, diagram) {
 
@@ -149,30 +146,43 @@ function loadDiagram(side, diagram) {
     return viewer.importXML(diagram.xml, done);
   }
 
-  $.get(diagram.url, function (xml) {
-    viewer.importXML(xml, done);
-  });
+  fetch(diagram.url)
+    .then(response => response.text())
+    .then(xml => viewer.importXML(xml, done));
 }
 
+function each(obj, fn) {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const elem = obj[key];
+      fn(key, elem);
+    }
+  }
+}
+
+function toggle(id) {
+  const elem = document.getElementById(id);
+  if (!elem) return;
+  elem.style.display=="block" ? "none" : "block";
+}
 
 function showDiff(viewerOld, viewerNew) {
 
-  var result = Diffing.diff(viewerOld.definitions, viewerNew.definitions);
+  var result = diff(viewerOld._definitions, viewerNew._definitions);
 
-
-  $.each(result._removed, function (i, obj) {
+  each(result._removed, function (i, obj) {
     highlight(viewerOld, i, 'diff-removed');
     addMarker(viewerOld, i, 'marker-removed', '&minus;');
   });
 
 
-  $.each(result._added, function (i, obj) {
+  each(result._added, function (i, obj) {
     highlight(viewerNew, i, 'diff-added');
     addMarker(viewerNew, i, 'marker-added', '&#43;');
   });
 
 
-  $.each(result._layoutChanged, function (i, obj) {
+  each(result._layoutChanged, function (i, obj) {
     highlight(viewerOld, i, 'diff-layout-changed');
     addMarker(viewerOld, i, 'marker-layout-changed', '&#8680;');
 
@@ -181,7 +191,7 @@ function showDiff(viewerOld, viewerNew) {
   });
 
 
-  $.each(result._changed, function (i, obj) {
+  each(result._changed, function (i, obj) {
 
     highlight(viewerOld, i, 'diff-changed');
     addMarker(viewerOld, i, 'marker-changed', '&#9998;');
@@ -190,7 +200,7 @@ function showDiff(viewerOld, viewerNew) {
     addMarker(viewerNew, i, 'marker-changed', '&#9998;');
 
     var details = '<table ><tr><th>Attribute</th><th>old</th><th>new</th></tr>';
-    $.each(obj.attrs, function (attr, changes) {
+    each(obj.attrs, function (attr, changes) {
       details = details + '<tr>' +
         '<td>' + attr + '</td><td>' + changes.oldValue + '</td>' +
         '<td>' + changes.newValue + '</td>' +
@@ -199,9 +209,9 @@ function showDiff(viewerOld, viewerNew) {
 
     details = details + '</table></div>';
 
-    viewerOld.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
-      $('#changeDetailsOld_' + i).toggle();
-    });
+    viewerOld.get('elementRegistry').getGraphics(i).onclick = function (event) {
+      toggle('changeDetailsOld_' + i);
+    };
 
     var detailsOld = '<div id="changeDetailsOld_' + i + '" class="changeDetails">' + details;
 
@@ -214,11 +224,11 @@ function showDiff(viewerOld, viewerNew) {
       html: detailsOld
     });
 
-    $('#changeDetailsOld_' + i).toggle();
+    toggle('#changeDetailsOld_' + i);
 
-    viewerNew.get('elementRegistry').getGraphicsByElement(i).click(function (event) {
-      $('#changeDetailsNew_' + i).toggle();
-    });
+    viewerNew.get('elementRegistry').getGraphics(i).onclick = function (event) {
+      toggle('#changeDetailsNew_' + i);
+    };
 
     var detailsNew = '<div id="changeDetailsNew_' + i + '" class="changeDetails">' + details;
 
@@ -231,7 +241,7 @@ function showDiff(viewerOld, viewerNew) {
       html: detailsNew
     });
 
-    $('#changeDetailsNew_' + i).toggle();
+    toggle('#changeDetailsNew_' + i);
   });
 
   // create Table Overview of Changes
@@ -254,15 +264,20 @@ function openFile(file, target, done) {
   reader.readAsText(file);
 }
 
+// only temporary
+function createFromTemplate(html) {
+  var template = document.createElement('template');
+  html = html.trim();
+  template.innerHTML = html;
+  return template.content.firstChild;
+}
 
-$('.drop-zone').each(function () {
-  var node = this,
-    element = $(node);
 
-  element.append('<div class="drop-marker" />');
+[...document.querySelectorAll('.drop-zone')].forEach(elem => {
+  elem.appendChild(createFromTemplate('<div class="drop-marker" />'));
 
   function removeMarker() {
-    $('.drop-zone').removeClass('dropping');
+    [...document.querySelectorAll('.drop-zone')].forEach(e => e.removeClass('dropping'));
   }
 
   function handleFileSelect(e) {
@@ -270,7 +285,7 @@ $('.drop-zone').each(function () {
     e.preventDefault();
 
     var files = e.dataTransfer.files;
-    openFile(files[0], element.attr('target'), openDiagram);
+    openFile(files[0], elem.getAttribute('target'), openDiagram);
 
     removeMarker();
   }
@@ -290,16 +305,15 @@ $('.drop-zone').each(function () {
     removeMarker();
   }
 
-  node.addEventListener('dragover', handleDragOver, false);
-  node.ownerDocument.body.addEventListener('dragover', handleDragLeave, false);
+  elem.addEventListener('dragover', handleDragOver, false);
+  elem.ownerDocument.body.addEventListener('dragover', handleDragLeave, false);
 
-  node.addEventListener('drop', handleFileSelect, false);
+  elem.addEventListener('drop', handleFileSelect, false);
 });
 
-$('.file').on('change', function (e) {
-  openFile(e.target.files[0], $(this).attr('target'), openDiagram);
-});
-
+[...document.querySelectorAll('.file')].forEach(
+  elem => elem.addEventListener('change', event => 
+    openFile(event.target.files[0], elem.getAttribute('target'), openDiagram)));
 
 function addMarker(viewer, elementId, className, symbol) {
 
@@ -327,16 +341,17 @@ function unhighlight(viewer, elementId, marker) {
   viewer.get('canvas').removeMarker(elementId, marker);
 }
 
-$('#changes-overview .show-hide-toggle').click(function () {
-  $('#changes-overview').toggleClass('collapsed');
-});
+document.querySelector('#changes-overview .show-hide-toggle').onclick = function () {
+  document.querySelector('#changes-overview').classList.toggle('collapsed');
+};
 
 
 function showChangesOverview(result, viewerOld, viewerNew) {
 
-  $('#changes-overview table').remove();
+  const table = document.querySelector('#changes-overview table');
+  if (table != null) table.remove();
 
-  var changesTable = $(
+  var changesTable = createFromTemplate(
     '<table>' +
     '<thead><tr><th>#</th><th>Name</th><th>Type</th><th>Change</th></tr></thead>' +
     '</table>');
@@ -351,41 +366,40 @@ function showChangesOverview(result, viewerOld, viewerNew) {
       '<td><span class="status">' + label + '</span></td>' +
       '</tr>';
 
-    var row = $(html).data({
-      changed: type,
-      element: element.id
-    }).addClass(type).appendTo(changesTable);
+    var row = createFromTemplate(html);
+    row.dataset.changed = type;
+    row.dataset.element = element.id;
+    row.classList.add(type);
+
+    changesTable.appendChild(row);
   }
 
-  $.each(result._removed, function (i, obj) {
+  each(result._removed, function (i, obj) {
     addRow(obj, 'removed', 'Removed');
   });
 
-  $.each(result._added, function (i, obj) {
+  each(result._added, function (i, obj) {
     addRow(obj, 'added', 'Added');
   });
 
-  $.each(result._changed, function (i, obj) {
+  each(result._changed, function (i, obj) {
     addRow(obj.model, 'changed', 'Changed');
   });
 
-  $.each(result._layoutChanged, function (i, obj) {
+  each(result._layoutChanged, function (i, obj) {
     addRow(obj, 'layout-changed', 'Layout Changed');
   });
 
-  changesTable.appendTo('#changes-overview .changes');
-
+  document.querySelector('#changes-overview .changes').appendChild(changesTable);
 
   var HIGHLIGHT_CLS = 'highlight';
 
-  $('#changes-overview tr.entry').each(function () {
+  [...document.querySelectorAll('#changes-overview tr.entry')].forEach(elem => {
 
-    var row = $(this);
+    var id = elem.dataset.element;
+    var changed = elem.dataset.changed;
 
-    var id = row.data('element');
-    var changed = row.data('changed');
-
-    row.hover(function () {
+    elem.onmouseover= _ => {
 
       if (changed == 'removed') {
         highlight(viewerOld, id, HIGHLIGHT_CLS);
@@ -395,7 +409,9 @@ function showChangesOverview(result, viewerOld, viewerNew) {
         highlight(viewerOld, id, HIGHLIGHT_CLS);
         highlight(viewerNew, id, HIGHLIGHT_CLS);
       }
-    }, function () {
+    }
+
+    elem.onmouseout = _ => {
 
       if (changed == 'removed') {
         unhighlight(viewerOld, id, HIGHLIGHT_CLS);
@@ -405,16 +421,17 @@ function showChangesOverview(result, viewerOld, viewerNew) {
         unhighlight(viewerOld, id, HIGHLIGHT_CLS);
         unhighlight(viewerNew, id, HIGHLIGHT_CLS);
       }
-    });
+    };
 
-    row.click(function () {
+    elem.onclick = _ => {
 
-      var containerWidth = $('.di-container').width();
-      var containerHeight = $('.di-container').height();
+      var containerWidth = document.querySelector('.di-container').clientWidth;
+
+      var containerHeight = document.querySelector('.di-container').clientHeight;
 
       var viewer = (changed == 'removed' ? viewerOld : viewerNew);
 
-      var element = viewer.get('elementRegistry').getById(id);
+      var element = viewer.get('elementRegistry').get(id);
 
       var x, y;
 
@@ -432,7 +449,8 @@ function showChangesOverview(result, viewerOld, viewerNew) {
         width: containerWidth,
         height: containerHeight
       });
-    });
+      syncNowFn(viewer, getOtherViewer(viewer))();
+    };
 
   });
 }
