@@ -4,7 +4,7 @@
   "description": "",
   "main": "app/app.js",
   "scripts": {
-    "dev": "webpack-dev-server --debug --output-pathinfo --open",
+    "start": "webpack-dev-server --debug --output-pathinfo --open",
     "build": "webpack"
   },
   "repository": {

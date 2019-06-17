@@ -83,7 +83,7 @@ export default class FileBrowser extends HTMLElement {
             this.renderFiles(tip.children, li);
         }
         else if (!tip.supported) {
-            li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a href="#" class="file ${tip.type}">${collapsedPath}</a> (unknown format)`;
+            li.innerHTML = `<span class="fa-li" ><i class="far ${icon}"></i></span><a class="file ${tip.type}">${collapsedPath}</a> (unknown format)`;
             parent.appendChild(li);
         }
         else {

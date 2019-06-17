@@ -8,6 +8,8 @@ const versionDiv = {
 	  left: document.querySelector("#versionLeft"),
 	  right: document.querySelector("#versionRight")
 };
+let diffCommand = true;
+
 window.addEventListener("unload", onBrowserClosed, false);
 
 function onBrowserClosed() {
@@ -121,7 +123,7 @@ function diagramLoaded(err, side, viewer) {
   }
 
   setLoading(viewer, err ? err : false);
-  if (allDiagramsLoaded()) {
+  if (allDiagramsLoaded() && diffCommand) {
 
     // sync viewboxes
     var other = getViewer(side == 'left' ? 'right' : 'left');
@@ -345,11 +347,14 @@ document.querySelector('#changes-overview .show-hide-toggle').onclick = function
   document.querySelector('#changes-overview').classList.toggle('collapsed');
 };
 
+function clearChangesOverview() {
+  const table = document.querySelector('#changes-overview table');
+  if (table != null) table.remove();
+}
 
 function showChangesOverview(result, viewerOld, viewerNew) {
 
-  const table = document.querySelector('#changes-overview table');
-  if (table != null) table.remove();
+  clearChangesOverview();
 
   var changesTable = createFromTemplate(
     '<table>' +
@@ -481,11 +486,30 @@ function main() {
 
           fileBrowser.addEventListener("file-selected", e => {
             const diff = e.detail;
+
+            clearChangesOverview();
+            
+            versionDiv['left'].innerText = '-';
+            versionDiv['right'].innerText = '-';
+
+            if (diff.type == "Modified") {
+              diffCommand = true;
+            }
+            else {
+              diffCommand = false;
+            }
             if (diff.type == "Removed" || diff.type == "Modified") {
               loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
             }
             if (diff.type == "Added" || diff.type == "Modified") {
               loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
+            }
+
+            if (diff.type == "Removed") {
+              getViewer('right').clear();
+            }
+            else if (diff.type == "Added") {
+              getViewer('left').clear();
             }
           });
 
