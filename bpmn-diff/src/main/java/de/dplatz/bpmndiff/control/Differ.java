@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.dplatz.bpmndiff.SharedConfig;

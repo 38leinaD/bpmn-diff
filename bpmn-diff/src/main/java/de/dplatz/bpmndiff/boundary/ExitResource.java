@@ -1,7 +1,5 @@
 package de.dplatz.bpmndiff.boundary;
 
-import javax.inject.Inject;
-
 import de.dplatz.bpmndiff.SharedConfig;
 import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;

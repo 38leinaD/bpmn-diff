@@ -27,6 +27,8 @@ java -jar bpmn-diff/build/libs/bpmn-diff.jar ./bpmn-diff-webapp/resources/pizza-
 
 A browser windows should open up showing the webapp. On close of the browser, the application should terminate.
 
+You cannot just diff files but whole folders.
+
 === Usage as Git difftool
 
 Add the following to your `.gitconfig`
@@ -55,11 +57,18 @@ For this reason, there is `--dir-diff` which is also supported by this tool:
 git difftool --dir-diff -t bpmn HEAD~1 HEAD
 ----
 
+This will open a pane to switch between files.
+
 == Browser Detection
 
-The tool opens the difftool/web-application in a browser. It will try to detect a browser on your system in the following way:
+The tool opens the difftool in a browser installed on your system. By default the `BestFit` strategy is used which will try to detect an appropriate browser in the following way:
 
 . If the environment variable `BROWSER_COMMAND` is defined, run this with the URL of the webapp as parameter.
 . If the executable `google-chrome` is detected on your `PATH`, use this executable.
 . If the executable `firefox` is detected on your `PATH`, use this executable.
 . Else, ask the operating system to use the default browser.
+
+Other strategies can be selected via the command-line flag `-browser=`. Values are `BestFit`, `Chrome`, `Firefox`, `System`.
+`System` will try to use whatever browser is configured by the operating system.
+
+TODO: Testing has been done with Linux only. So, setting  `Chrome` or`Firefox` might fail on windows as it only checks if specifically named executables are found on the `PATH`.

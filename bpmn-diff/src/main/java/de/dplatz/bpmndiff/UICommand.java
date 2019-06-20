@@ -2,9 +2,10 @@ package de.dplatz.bpmndiff;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -12,12 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.dplatz.bpmndiff.boundary.DiffResource;
+import de.dplatz.bpmndiff.browsers.BrowserDetection;
+import de.dplatz.bpmndiff.browsers.BrowserDetection.Strategy;
 import de.dplatz.bpmndiff.entity.Diff;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.runtime.server.EmbeddedServer;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -25,9 +28,15 @@ import picocli.CommandLine.Parameters;
 public class UICommand implements Runnable {
 	Logger logger = LoggerFactory.getLogger(UICommand.class);
 
-	@Option(names = { "-b", "--open-browser" }, description = "...")
+	@Option(names = { "-b", "--browser" }, description = "Browser to use: ${COMPLETION-CANDIDATES}", showDefaultValue = Visibility.ALWAYS)
+	BrowserDetection.Strategy strategy = Strategy.BestFit;
+	
+	@Option(names = { "-o", "--open-browser" }, description = "Open a browser-window.")
 	boolean openBrowser = true;
 
+	@Option(names = { "-p", "--port" }, description = "Port of the http-server.")
+	int port = -1;
+	
 	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
@@ -38,12 +47,11 @@ public class UICommand implements Runnable {
 	@Inject
 	DiffResource differ;
 
-	private RxHttpClient serverConnector;
-
 	public void run() {
-		EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class);
-		serverConnector = createServerConnector(server);
-
+		Map<String, Object> config = new HashMap<>();
+		config.put("micronaut.server.port", port);
+		EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class, config);
+		
 		configureServer();
 
 		try {
@@ -65,7 +73,7 @@ public class UICommand implements Runnable {
 		URI webappUri = resolveWebapp(server);
 
 		if (openBrowser) {
-			if (!new BrowserDetection().open(webappUri)) {
+			if (!strategy.open(webappUri)) {
 				logger.error("Unable to open browser at '" + webappUri + "'. Please open URL manually.");
 			}
 		}
@@ -82,14 +90,6 @@ public class UICommand implements Runnable {
 			throw new RuntimeException(e);
 		}
 		return webappUri;
-	}
-
-	private RxHttpClient createServerConnector(EmbeddedServer server) {
-		try {
-			return RxHttpClient.create(server.getURI().toURL());
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	private void configureServer() {
