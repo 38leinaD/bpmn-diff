@@ -78,6 +78,7 @@ public class UICommand implements Runnable {
 			}
 		}
 		else {
+			System.out.println("Please manually open '" + webappUri + "'.");
 			SharedConfig.getInstance().exitOnBeacon(false);
 		}
 	}
