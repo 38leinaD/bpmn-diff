@@ -488,7 +488,7 @@ function main() {
             const diff = e.detail;
 
             clearChangesOverview();
-            
+
             versionDiv['left'].innerText = '-';
             versionDiv['right'].innerText = '-';
 

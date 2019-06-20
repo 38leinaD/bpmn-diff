@@ -10,9 +10,11 @@ module.exports = {
         filename: 'app.js'
     },
     devServer: {
-        contentBase: './dist',
+        contentBase: './app',
+        watchContentBase: true,
         port: 3000,
-        hot: true
+        hot: true,
+        overlay: true
     },
     plugins: [
         new CopyPlugin([

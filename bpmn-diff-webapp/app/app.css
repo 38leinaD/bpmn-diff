@@ -114,6 +114,10 @@ a.file.Modified {
   color: blue;
 }
 
+a.file.unknown-format {
+  opacity: 0.4;
+}
+
 a-file-browser > ul.fa-ul {
   margin-left: 2em;
 }
