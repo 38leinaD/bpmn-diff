@@ -1,18 +1,18 @@
 package de.dplatz.bpmndiff;
 
 import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class SharedConfig {
-	// TODO: Sharing config between Micronaut und picocli via @Singleton does not work...
-	static SharedConfig INSTANCE = new SharedConfig();
-	
-	public static SharedConfig getInstance() {
-		return INSTANCE;
-	}
 	
 	private boolean exitOnBeacon = true;
 	private Path left;
 	private Path right;
+	
+	public CountDownLatch exitLatch = new CountDownLatch(1);
 	
 	public boolean shouldExitOnBeacon() {
 		return exitOnBeacon;

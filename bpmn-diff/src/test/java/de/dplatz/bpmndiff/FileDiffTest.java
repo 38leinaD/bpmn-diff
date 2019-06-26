@@ -24,13 +24,16 @@ public class FileDiffTest {
 	@Inject
 	Differ differ;
 	
+	@Inject
+	SharedConfig config;
+	
 	@Test
 	void should_diff_bpmn_files() {
 
 		// TODO
 		differ.reset();
-		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn"));
-		SharedConfig.getInstance().setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn"));
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn"));
+		config.setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn"));
 		
 		Diff diff = client.toBlocking().retrieve("/", Diff.class);
 
@@ -44,8 +47,8 @@ public class FileDiffTest {
 	@Test
 	void should_should_not_support_text_files() {
 		differ.reset();
-		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt"));
-		SharedConfig.getInstance().setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt"));
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt"));
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt"));
 		
 		Diff diff = client.toBlocking().retrieve("/", Diff.class);
 		

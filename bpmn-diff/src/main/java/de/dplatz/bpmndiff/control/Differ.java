@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.dplatz.bpmndiff.SharedConfig;
@@ -13,6 +14,9 @@ import de.dplatz.bpmndiff.entity.Directory;
 
 @Singleton
 public class Differ {
+	
+	@Inject
+	SharedConfig config;
 	
 	Object diffResult = null;
 	
@@ -31,7 +35,6 @@ public class Differ {
 	}
 	
 	public Object diff() throws IOException {
-		SharedConfig config = SharedConfig.getInstance();
 		if (diffResult == null) {
 			diffResult = Diff.ofPaths(config.getLeft(), config.getRight());
 			if (Directory.class.isInstance(diffResult)) {

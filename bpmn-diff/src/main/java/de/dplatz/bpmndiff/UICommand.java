@@ -34,25 +34,35 @@ public class UICommand implements Runnable {
 	@Option(names = { "-o", "--open-browser" }, description = "Open a browser-window.")
 	boolean openBrowser = true;
 
-	@Option(names = { "-p", "--port" }, description = "Port of the http-server.")
-	int port = -1;
-	
 	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
 	public static void main(String[] args) throws Exception {
-		PicocliRunner.run(UICommand.class, args);
+		Map<String, Object> config = new HashMap<>();
+		config.put("micronaut.server.port", System.getProperty("port", "-1"));
+		try (ApplicationContext appContext = ApplicationContext.run(config)) {
+			PicocliRunner.run(UICommand.class, appContext, args);
+		}
 	}
 		
+	@Inject
+	ApplicationContext appContext;
+	
+	@Inject
+	SharedConfig sharedConfig;
+	
 	@Inject
 	DiffResource differ;
 
 	public void run() {
-		Map<String, Object> config = new HashMap<>();
-		config.put("micronaut.server.port", port);
-		EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class, config);
+		EmbeddedServer server = appContext.getBean(EmbeddedServer.class);
 		
-		configureServer();
+		if(!server.isRunning()) {
+			server.start();
+		}
+		
+		sharedConfig.setLeft(inputFiles[0].toPath());
+		sharedConfig.setRight(inputFiles[1].toPath());
 
 		try {
 			Object diff = differ.diff();
@@ -79,8 +89,16 @@ public class UICommand implements Runnable {
 		}
 		else {
 			System.out.println("Please manually open '" + webappUri + "'.");
-			SharedConfig.getInstance().exitOnBeacon(false);
+			sharedConfig.exitOnBeacon(false);
 		}
+		
+		try {
+			sharedConfig.exitLatch.await();
+		} catch (InterruptedException e) {
+			logger.error("Error while waiting on exit-latch", e);
+		}
+		System.out.println("Goodbye!");
+		System.exit(0);
 	}
 
 	private URI resolveWebapp(EmbeddedServer server) {
@@ -91,10 +109,5 @@ public class UICommand implements Runnable {
 			throw new RuntimeException(e);
 		}
 		return webappUri;
-	}
-
-	private void configureServer() {
-		SharedConfig.getInstance().setLeft(inputFiles[0].toPath());
-		SharedConfig.getInstance().setRight(inputFiles[1].toPath());
 	}
 }
