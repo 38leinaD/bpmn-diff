@@ -5,8 +5,8 @@ import diff from './lib/differ.js'
 
 const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
 const versionDiv = {
-	  left: document.querySelector("#versionLeft"),
-	  right: document.querySelector("#versionRight")
+  left: document.querySelector("#versionLeft"),
+  right: document.querySelector("#versionRight")
 };
 let diffCommand = true;
 
@@ -41,7 +41,7 @@ function syncNowFn(movedViewer, viewer) {
 
 function syncViewers(a, b) {
 
-  
+
 
   function syncViewbox(a, b) {
     a.on('canvas.viewbox.changing', syncNowFn(a, b));
@@ -165,7 +165,7 @@ function each(obj, fn) {
 function toggle(id) {
   const elem = document.getElementById(id);
   if (!elem) return;
-  elem.style.display=="block" ? "none" : "block";
+  elem.style.display == "block" ? "none" : "block";
 }
 
 function showDiff(viewerOld, viewerNew) {
@@ -314,7 +314,7 @@ function createFromTemplate(html) {
 });
 
 [...document.querySelectorAll('.file')].forEach(
-  elem => elem.addEventListener('change', event => 
+  elem => elem.addEventListener('change', event =>
     openFile(event.target.files[0], elem.getAttribute('target'), openDiagram)));
 
 function addMarker(viewer, elementId, className, symbol) {
@@ -404,7 +404,7 @@ function showChangesOverview(result, viewerOld, viewerNew) {
     var id = elem.dataset.element;
     var changed = elem.dataset.changed;
 
-    elem.onmouseover= _ => {
+    elem.onmouseover = _ => {
 
       if (changed == 'removed') {
         highlight(viewerOld, id, HIGHLIGHT_CLS);
@@ -462,7 +462,7 @@ function showChangesOverview(result, viewerOld, viewerNew) {
 
 function bfsSearchFile(files) {
   for (let file of files) {
-    if (file.children === undefined) {
+    if (file.children === undefined && file.supported) {
       return file;
     }
   }
@@ -476,58 +476,58 @@ function bfsSearchFile(files) {
 
 function main() {
   fetch(`${BACKEND_URI}/diff`)
-  .then(r => r.json())
-  .then(diff => {
-    if (Array.isArray(diff)) {
-      // folder diff
-      customElements.whenDefined("a-file-browser")
-        .then(_ => {
-          const fileBrowser = document.querySelector("a-file-browser");
+    .then(r => r.json())
+    .then(diff => {
+      if (Array.isArray(diff)) {
+        // folder diff
+        customElements.whenDefined("a-file-browser")
+          .then(_ => {
+            const fileBrowser = document.querySelector("a-file-browser");
 
-          fileBrowser.addEventListener("file-selected", e => {
-            const diff = e.detail;
+            fileBrowser.addEventListener("file-selected", e => {
+              const diff = e.detail;
 
-            clearChangesOverview();
+              clearChangesOverview();
 
-            versionDiv['left'].innerText = '-';
-            versionDiv['right'].innerText = '-';
+              versionDiv['left'].innerText = '-';
+              versionDiv['right'].innerText = '-';
 
-            if (diff.type == "Modified") {
-              diffCommand = true;
-            }
-            else {
-              diffCommand = false;
-            }
-            if (diff.type == "Removed" || diff.type == "Modified") {
-              loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
-            }
-            if (diff.type == "Added" || diff.type == "Modified") {
-              loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
-            }
+              if (diff.type == "Modified") {
+                diffCommand = true;
+              }
+              else {
+                diffCommand = false;
+              }
+              if (diff.type == "Removed" || diff.type == "Modified") {
+                loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
+              }
+              if (diff.type == "Added" || diff.type == "Modified") {
+                loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
+              }
 
-            if (diff.type == "Removed") {
-              getViewer('right').clear();
-            }
-            else if (diff.type == "Added") {
-              getViewer('left').clear();
-            }
+              if (diff.type == "Removed") {
+                getViewer('right').clear();
+              }
+              else if (diff.type == "Added") {
+                getViewer('left').clear();
+              }
+            });
+
+            fileBrowser.ls(diff);
+
+            const foundFile = bfsSearchFile(diff);
+            if (foundFile) fileBrowser.select(foundFile);
           });
+      }
+      else {
+        // file diff
+        loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
+        loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
 
-          fileBrowser.ls(diff);
-          
-          const foundFile = bfsSearchFile(diff);
-          if (foundFile) fileBrowser.select(foundFile);
-        });
-    }
-    else {
-      // file diff
-      loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
-      loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
+        document.querySelector('main').classList.add('collapsedNav');
+      }
+    });
 
-      document.querySelector('main').classList.add('collapsedNav');
-    }
-  });
-  
 }
 
 main();

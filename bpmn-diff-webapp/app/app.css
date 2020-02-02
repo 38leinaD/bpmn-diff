@@ -93,6 +93,15 @@ article {
  * file browser
  */
 
+a-file-browser {
+}
+
+svg.file-icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+}
+
 h2 {
   margin: 0px;
 }
@@ -119,11 +128,17 @@ a.file.unknown-format {
 }
 
 a-file-browser > ul.fa-ul {
-  margin-left: 2em;
+  margin-left: 1em;
 }
 
 li > ul.fa-ul  {
   margin-left: 1em;
+}
+
+ul.fa-ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 /**
