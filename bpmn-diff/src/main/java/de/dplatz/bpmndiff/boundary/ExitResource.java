@@ -1,23 +1,25 @@
 package de.dplatz.bpmndiff.boundary;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import de.dplatz.bpmndiff.SharedConfig;
-import io.micronaut.http.annotation.Consumes;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
 
-@Controller("/exit")
+@Path("/exit")
 public class ExitResource {
 	
 	@Inject
 	SharedConfig config;
 	
-	@Post
+	@POST
 	@Consumes("text/plain")
 	public void exit() {
 		if (config.shouldExitOnBeacon()) {
-			config.exitLatch.countDown();
+			//config.exitLatch.countDown();
+			System.out.println("EXIT REQUESTED BY BROWSER");
+			System.exit(0);
 		}
 	}
 }

@@ -5,21 +5,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.dplatz.bpmndiff.control.Differ;
 import de.dplatz.bpmndiff.entity.Diff;
-import io.micronaut.http.client.RxHttpClient;
-import io.micronaut.http.client.annotation.Client;
-import io.micronaut.test.annotation.MicronautTest;
+import io.quarkus.test.junit.QuarkusTest;
 
-@MicronautTest
+@QuarkusTest
 public class FileDiffTest {
 
-	@Inject
-    @Client("/diff")
-    RxHttpClient client; 
+	private WebTarget tut;
+
+	@BeforeEach
+	public void init() {
+		tut = ClientBuilder.newClient().target("http://localhost:8081/diff");
+	}
 	
 	@Inject
 	Differ differ;
@@ -35,8 +39,8 @@ public class FileDiffTest {
 		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn"));
 		config.setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn"));
 		
-		Diff diff = client.toBlocking().retrieve("/", Diff.class);
-
+		Diff diff = tut.request().get(Diff.class);
+		
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn").toAbsolutePath().normalize(), diff.getLeftPath());
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn").toAbsolutePath().normalize(), diff.getRightPath());
 		assertEquals(true, diff.isSupported());
@@ -50,7 +54,7 @@ public class FileDiffTest {
 		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt"));
 		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt"));
 		
-		Diff diff = client.toBlocking().retrieve("/", Diff.class);
+		Diff diff = tut.request().get(Diff.class);
 		
 		assertEquals(false, diff.isSupported());
 	}

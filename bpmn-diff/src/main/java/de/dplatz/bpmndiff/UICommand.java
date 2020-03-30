@@ -3,9 +3,7 @@ package de.dplatz.bpmndiff;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -16,16 +14,19 @@ import de.dplatz.bpmndiff.boundary.DiffResource;
 import de.dplatz.bpmndiff.browsers.BrowserDetection;
 import de.dplatz.bpmndiff.browsers.BrowserDetection.Strategy;
 import de.dplatz.bpmndiff.entity.Diff;
-import io.micronaut.configuration.picocli.PicocliRunner;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.runtime.server.EmbeddedServer;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+
+@QuarkusMain
 @Command(name = "ui", description = "...", mixinStandardHelpOptions = true)
-public class UICommand implements Runnable {
+public class UICommand implements Callable<Integer>, QuarkusApplication {
 	Logger logger = LoggerFactory.getLogger(UICommand.class);
 
 	@Option(names = { "-b", "--browser" }, description = "Browser to use: ${COMPLETION-CANDIDATES}", showDefaultValue = Visibility.ALWAYS)
@@ -37,16 +38,6 @@ public class UICommand implements Runnable {
 	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
-	public static void main(String[] args) throws Exception {
-		Map<String, Object> config = new HashMap<>();
-		config.put("micronaut.server.port", System.getProperty("port", "-1"));
-		try (ApplicationContext appContext = ApplicationContext.run(config)) {
-			PicocliRunner.run(UICommand.class, appContext, args);
-		}
-	}
-		
-	@Inject
-	ApplicationContext appContext;
 	
 	@Inject
 	SharedConfig sharedConfig;
@@ -54,13 +45,19 @@ public class UICommand implements Runnable {
 	@Inject
 	DiffResource differ;
 
-	public void run() {
-		EmbeddedServer server = appContext.getBean(EmbeddedServer.class);
-		
-		if(!server.isRunning()) {
-			server.start();
-		}
-		
+	
+    public static void main(String[] args) {
+        Quarkus.run(UICommand.class, args);
+    }
+	
+    @Override
+    public int run(String... args) throws Exception {
+        return new CommandLine(this).execute(args);
+    }
+
+	@Override
+    public Integer call() throws Exception {
+        
 		sharedConfig.setLeft(inputFiles[0].toPath());
 		sharedConfig.setRight(inputFiles[1].toPath());
 
@@ -77,11 +74,12 @@ public class UICommand implements Runnable {
 			
 		} catch (IOException e) {
 			logger.error("Error while diffing.", e);
-			System.exit(-1);
+			return -1;
 		}
 		
-		URI webappUri = resolveWebapp(server);
-
+		//URI webappUri = resolveWebapp(server);
+		URI webappUri = new URI("http://localhost:8080/ui/index.html");
+		
 		if (openBrowser) {
 			if (!strategy.open(webappUri)) {
 				logger.error("Unable to open browser at '" + webappUri + "'. Please open URL manually.");
@@ -92,15 +90,25 @@ public class UICommand implements Runnable {
 			sharedConfig.exitOnBeacon(false);
 		}
 		
+		/*
 		try {
 			sharedConfig.exitLatch.await();
 		} catch (InterruptedException e) {
 			logger.error("Error while waiting on exit-latch", e);
 		}
+		*/
+		Quarkus.waitForExit();
 		System.out.println("Goodbye!");
-		System.exit(0);
+		
+		
+        return 0;
+    }
+    
+	public void run() {
+		
 	}
 
+	/*
 	private URI resolveWebapp(EmbeddedServer server) {
 		URI webappUri;
 		try {
@@ -110,4 +118,5 @@ public class UICommand implements Runnable {
 		}
 		return webappUri;
 	}
+	*/
 }

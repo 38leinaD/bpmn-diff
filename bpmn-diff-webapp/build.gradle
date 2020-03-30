@@ -15,19 +15,19 @@ task bundleWebApp(type:Exec) {
     commandLine './bundle.sh'
 }
 
-packageWebapp.dependsOn bundleWebApp
 
 configurations {
-    npmResources
+    webapp
 }
-configurations.default.extendsFrom(configurations.npmResources)
+configurations.default.extendsFrom(configurations.webapp)
 
 
 artifacts {
-    npmResources(packageWebapp.archivePath) {
+    webapp(packageWebapp.archivePath) {
         builtBy packageWebapp
         type "jar"
     }
 }
 
+packageWebapp.dependsOn npmInstall
 assemble.dependsOn(packageWebapp)
