@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/38leinaD/bpmn-diff#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
+    "@webcomponents/webcomponentsjs": "^2.2.10",
     "bpmn-js": "^3.4.1",
     "jsondiffpatch": "^0.3.11",
-    "@webcomponents/webcomponentsjs": "^2.2.10"
+    "lit-element": "^2.3.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.3",

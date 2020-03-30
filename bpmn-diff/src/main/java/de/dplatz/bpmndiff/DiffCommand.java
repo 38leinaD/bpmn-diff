@@ -3,9 +3,8 @@ package de.dplatz.bpmndiff;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -16,17 +15,20 @@ import de.dplatz.bpmndiff.boundary.DiffResource;
 import de.dplatz.bpmndiff.browsers.BrowserDetection;
 import de.dplatz.bpmndiff.browsers.BrowserDetection.Strategy;
 import de.dplatz.bpmndiff.entity.Diff;
-import io.micronaut.configuration.picocli.PicocliRunner;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.runtime.server.EmbeddedServer;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "ui", description = "...", mixinStandardHelpOptions = true)
-public class UICommand implements Runnable {
-	Logger logger = LoggerFactory.getLogger(UICommand.class);
+
+@QuarkusMain
+@Command(name = "diff", description = "...", mixinStandardHelpOptions = true)
+public class DiffCommand implements Callable<Integer>, QuarkusApplication {
+	static Logger logger = LoggerFactory.getLogger(DiffCommand.class);
 
 	@Option(names = { "-b", "--browser" }, description = "Browser to use: ${COMPLETION-CANDIDATES}", showDefaultValue = Visibility.ALWAYS)
 	BrowserDetection.Strategy strategy = Strategy.BestFit;
@@ -37,16 +39,6 @@ public class UICommand implements Runnable {
 	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
-	public static void main(String[] args) throws Exception {
-		Map<String, Object> config = new HashMap<>();
-		config.put("micronaut.server.port", System.getProperty("port", "-1"));
-		try (ApplicationContext appContext = ApplicationContext.run(config)) {
-			PicocliRunner.run(UICommand.class, appContext, args);
-		}
-	}
-		
-	@Inject
-	ApplicationContext appContext;
 	
 	@Inject
 	SharedConfig sharedConfig;
@@ -54,13 +46,26 @@ public class UICommand implements Runnable {
 	@Inject
 	DiffResource differ;
 
-	public void run() {
-		EmbeddedServer server = appContext.getBean(EmbeddedServer.class);
-		
-		if(!server.isRunning()) {
-			server.start();
-		}
-		
+	
+    public static void main(String[] args) {
+        /*if (System.getProperty("quarkus.http.port") == null) {
+            int randomPort = new Random().nextInt(65535 - 1024) + 1024;
+            
+            logger.info("Using port {}", randomPort);
+            System.setProperty("quarkus.http.port", randomPort + "");
+        }
+        */
+        Quarkus.run(DiffCommand.class, args);
+    }
+	
+    @Override
+    public int run(String... args) throws Exception {
+        return new CommandLine(this).execute(args);
+    }
+
+	@Override
+    public Integer call() throws Exception {
+        
 		sharedConfig.setLeft(inputFiles[0].toPath());
 		sharedConfig.setRight(inputFiles[1].toPath());
 
@@ -77,11 +82,12 @@ public class UICommand implements Runnable {
 			
 		} catch (IOException e) {
 			logger.error("Error while diffing.", e);
-			System.exit(-1);
+			return -1;
 		}
 		
-		URI webappUri = resolveWebapp(server);
-
+		//URI webappUri = resolveWebapp(server);
+		URI webappUri = new URI("http://localhost:8080/index.html");
+		
 		if (openBrowser) {
 			if (!strategy.open(webappUri)) {
 				logger.error("Unable to open browser at '" + webappUri + "'. Please open URL manually.");
@@ -91,16 +97,12 @@ public class UICommand implements Runnable {
 			System.out.println("Please manually open '" + webappUri + "'.");
 			sharedConfig.exitOnBeacon(false);
 		}
+		Quarkus.waitForExit();
 		
-		try {
-			sharedConfig.exitLatch.await();
-		} catch (InterruptedException e) {
-			logger.error("Error while waiting on exit-latch", e);
-		}
-		System.out.println("Goodbye!");
-		System.exit(0);
-	}
-
+        return 0;
+    }
+    
+	/*
 	private URI resolveWebapp(EmbeddedServer server) {
 		URI webappUri;
 		try {
@@ -110,4 +112,5 @@ public class UICommand implements Runnable {
 		}
 		return webappUri;
 	}
+	*/
 }

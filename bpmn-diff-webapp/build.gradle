@@ -6,28 +6,26 @@ apply plugin: 'base'
 task packageWebapp(type: Zip) {
     baseName 'bpmn-diff-webapp'
     extension 'jar'
-    from('dist') {
-        into 'static' 
-    }
+    from('dist')
 }
 
-task bundleWebApp(type:Exec) {
-    commandLine './bundle.sh'
+task npmBuild(type: NpmTask) {
+	args = ['run', 'build']
 }
-
-packageWebapp.dependsOn bundleWebApp
 
 configurations {
-    npmResources
+    webapp
 }
-configurations.default.extendsFrom(configurations.npmResources)
+configurations.default.extendsFrom(configurations.webapp)
 
 
 artifacts {
-    npmResources(packageWebapp.archivePath) {
+    webapp(packageWebapp.archivePath) {
         builtBy packageWebapp
         type "jar"
     }
 }
 
+npmBuild.dependsOn npmInstall
+packageWebapp.dependsOn npmBuild
 assemble.dependsOn(packageWebapp)

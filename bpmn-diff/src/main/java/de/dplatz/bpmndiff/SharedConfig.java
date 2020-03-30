@@ -3,17 +3,16 @@ package de.dplatz.bpmndiff;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Singleton;
 
-@Singleton
+@ApplicationScoped
 public class SharedConfig {
 	
 	private boolean exitOnBeacon = true;
 	private Path left;
 	private Path right;
-	
-	public CountDownLatch exitLatch = new CountDownLatch(1);
-	
+		
 	public boolean shouldExitOnBeacon() {
 		return exitOnBeacon;
 	}

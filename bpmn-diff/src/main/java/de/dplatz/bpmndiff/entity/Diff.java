@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -19,8 +20,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Diff extends Node {
 	
+    @JsonbTransient
 	Logger logger = LoggerFactory.getLogger(Diff.class);
 
 	
@@ -121,7 +126,8 @@ public class Diff extends Node {
 			factory.setNamespaceAware(true);
 	
 			SAXParser parser = factory.newSAXParser();
-	
+			parser.getParser().setErrorHandler(null);
+
 			XMLReader reader = parser.getXMLReader();
 			reader.parse(new InputSource(new FileInputStream(p.toFile())));
 			
@@ -145,7 +151,7 @@ public class Diff extends Node {
 		return id;
 	}
 
-	public boolean isSupported() {
+    public boolean isSupported() {
 		return supported;
 	}
 }
