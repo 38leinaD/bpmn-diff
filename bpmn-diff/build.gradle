@@ -27,9 +27,12 @@ dependencies {
 
 }
 
+// https://discuss.gradle.org/t/right-way-to-copy-contents-from-dependency-archives/7449/12
 task copyFrontend(type: Copy) {
-    dependsOn ":bpmn-diff-webapp:build"
-    from "${buildDir}/../../bpmn-diff-webapp/dist"
+    //dependsOn ":bpmn-diff-webapp:build"
+    configurations.webapp
+    
+    from configurations.webapp.collect { zipTree(it) }
     into "$buildDir/resources/main/META-INF/resources"
     include "**/*"
 }
@@ -44,6 +47,6 @@ compileJava {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

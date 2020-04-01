@@ -78,7 +78,7 @@ public class UICommand implements Callable<Integer>, QuarkusApplication {
 		}
 		
 		//URI webappUri = resolveWebapp(server);
-		URI webappUri = new URI("http://localhost:8080/ui/index.html");
+		URI webappUri = new URI("http://localhost:8080/index.html");
 		
 		if (openBrowser) {
 			if (!strategy.open(webappUri)) {
@@ -101,13 +101,9 @@ public class UICommand implements Callable<Integer>, QuarkusApplication {
 		System.out.println("Goodbye!");
 		
 		
-        return 0;
+        return 123;
     }
     
-	public void run() {
-		
-	}
-
 	/*
 	private URI resolveWebapp(EmbeddedServer server) {
 		URI webappUri;
