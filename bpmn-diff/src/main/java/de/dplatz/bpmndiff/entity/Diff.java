@@ -124,7 +124,8 @@ public class Diff extends Node {
 			factory.setNamespaceAware(true);
 	
 			SAXParser parser = factory.newSAXParser();
-	
+			parser.getParser().setErrorHandler(null);
+
 			XMLReader reader = parser.getXMLReader();
 			reader.parse(new InputSource(new FileInputStream(p.toFile())));
 			
