@@ -17,9 +17,8 @@ public class ExitResource {
 	@Consumes("text/plain")
 	public void exit() {
 		if (config.shouldExitOnBeacon()) {
-			//config.exitLatch.countDown();
+			config.exitLatch.countDown();
 			System.out.println("EXIT REQUESTED BY BROWSER");
-			System.exit(0);
 		}
 	}
 }

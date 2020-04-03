@@ -30,7 +30,7 @@ dependencies {
 // https://discuss.gradle.org/t/right-way-to-copy-contents-from-dependency-archives/7449/12
 task copyFrontend(type: Copy) {
     //dependsOn ":bpmn-diff-webapp:build"
-    configurations.webapp
+    dependsOn configurations.webapp
     
     from configurations.webapp.collect { zipTree(it) }
     into "$buildDir/resources/main/META-INF/resources"
@@ -50,3 +50,18 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
+
+/*
+buildNative {
+    additionalBuildArgs = [
+            '-H:ResourceConfigurationFiles=reflect-config.json'
+    ]
+}
+*/
+/*
+buildNative {
+    additionalBuildArgs = [
+            '-H:IncludeResourceBundles=com.sun.org.apache.xerces.internal.impl.msg.XMLMessages'
+    ]
+}
+*/

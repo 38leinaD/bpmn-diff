@@ -90,14 +90,15 @@ public class UICommand implements Callable<Integer>, QuarkusApplication {
 			sharedConfig.exitOnBeacon(false);
 		}
 		
-		/*
+		
 		try {
 			sharedConfig.exitLatch.await();
 		} catch (InterruptedException e) {
 			logger.error("Error while waiting on exit-latch", e);
 		}
-		*/
-		Quarkus.waitForExit();
+		
+		
+		//Quarkus.waitForExit();
 		System.out.println("Goodbye!");
 		
 		
