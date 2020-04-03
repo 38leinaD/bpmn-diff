@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<link rel="stylesheet" type="text/css" href="bpmnio.css">
+	<link rel="stylesheet" type="text/css" href="diff.css">
+	<link rel="stylesheet" type="text/css" href="app.css">
+
+	<script src="./lib/webcomponents-bundle.js"></script>
+
+	<!--
+    this is a BPMN 2.0 process diagram diffing example created with bpmn-js
+
+    https://github.com/bpmn-io/bpmn-js-diffing
+  -->
+
+	<title>BPMN-flow difftool</title>
+</head>
+
+<body>
+
+	<main>
+		<nav>
+			<a-file-browser collapseEmpty="false"></a-file-browser>
+		</nav>
+		<article>
+			<div class="di-container left drop-zone" target="left">
+
+				<div class="io-control di-header">
+					<h2 id="versionLeft">-</h2>
+					<input class="file" type="file" target="left">
+				</div>
+
+				<div class="canvas" id="canvas-left"></div>
+			</div>
+
+			<div class="di-container right drop-zone" target="right">
+				<div class="io-control di-header">
+					<h2 id="versionRight">-</h2>
+					<input class="file" type="file" target="right">
+				</div>
+
+				<div class="canvas" id="canvas-right"></div>
+			</div>
+		</article>
+	</main>
+
+	<div id="changes-overview" class="collapsed">
+		<div class="io-control show-hide-toggle">List of Changes</div>
+		<div class="io-control changes"></div>
+	</div>
+
+	<!-- viewer dependencies -->
+
+	<!-- viewer -->
+	<!--script src="bpmn-viewer.js"></script-->
+	<script src="https://unpkg.com/bpmn-js@3.4.3/dist/bpmn-viewer.development.js"></script>
+
+
+	<!-- app -->
+	<script src="app.js" type="module"></script>
+</body>
+
+</html>

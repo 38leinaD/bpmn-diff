@@ -19,6 +19,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Diff extends Node {
 	
 	Logger logger = LoggerFactory.getLogger(Diff.class);

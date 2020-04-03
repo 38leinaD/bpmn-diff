@@ -2,6 +2,9 @@ package de.dplatz.bpmndiff.entity;
 
 import java.nio.file.Path;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Node implements Comparable<Node> {
 	private Path leftPath, rightPath;
 
