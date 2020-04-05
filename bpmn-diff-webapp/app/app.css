@@ -9,7 +9,7 @@ main {
 	height: 100vh;
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 1fr 6fr;
+    grid-template-columns: 1.5fr 6fr;
     grid-template-areas: 
     "nav article"
 }
@@ -93,52 +93,108 @@ article {
  * file browser
  */
 
-a-file-browser {
+ ul.tree {
+  box-sizing: border-box;
+  padding-left: 20px;
+  user-select: none;
+  cursor: pointer;
+  padding-left: 0;
 }
 
-svg.file-icon {
-  width: 15px;
-  height: 15px;
-  margin-right: 5px;
+ul {
+  padding-left: 20px;
 }
 
-h2 {
-  margin: 0px;
+.icon::before {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  color: rgb(132, 132, 132);
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+
+  font-size: 14px;
+  padding: 2px;
+
+
+  vertical-align: middle;
+  margin: 0 0.5em 0 0;
+  float: none;
+  width: 10px;
+
 }
 
-li.selected, li.selected > a {
+li.treenode {
+  border-radius: 3px;
+
+  color: white;
+  background-color: #007ad9;
+}
+
+.treenode-icon-file::before {
+  content: "\f15b";
+}
+
+.treenode-icon-folder::before {
+  content: "\f07b";
+}
+
+.treenode-toggler-collapsed::before {
+  content: "\f0da";
+}
+
+.treenode-toggler-expanded::before {
+  content: "\f0d7";
+}
+
+.treenode-toggler-none::before {
+  content: ""
+}
+
+.treenode-label {
+  color: rgb(132, 132, 132);
+
+  padding: 3px;
+  border-radius: 3px;
+
+}
+
+
+.treenode-label:hover:not(.treenode-label-selected) {
+
+  color: white;
+  background-color: rgb(132, 132, 132);
+}
+
+.treenode-label-selected {
+  color: white;
+  background-color: #007ad9;
   font-weight: bold;
 }
 
-a.file.Added {
+.treenode-hint::before {
+  content: "("
+}
+
+.treenode-hint {
+  font-size: 0.8em;
+}
+
+.treenode-hint::after {
+  content: ")"
+}
+
+.treenode-hint.Added {
   color: green;
 }
 
-a.file.Removed {
+.treenode-hint.Removed {
   color: red;
-  text-decoration: line-through;
 }
 
-a.file.Modified {
+.treenode-hint.Modified {
   color: blue;
-}
-
-a.file.unknown-format {
-  opacity: 0.4;
-}
-
-a-file-browser > ul.fa-ul {
-  margin-left: 1em;
-}
-
-li > ul.fa-ul  {
-  margin-left: 1em;
-}
-
-ul.fa-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
 }
 
 /**

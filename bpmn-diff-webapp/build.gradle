@@ -9,10 +9,9 @@ task packageWebapp(type: Zip) {
     from('dist')
 }
 
-task bundleWebApp(type:Exec) {
-    commandLine './bundle.sh'
+task npmBuild(type: NpmTask) {
+	args = ['run', 'build']
 }
-
 
 configurations {
     webapp
@@ -27,5 +26,6 @@ artifacts {
     }
 }
 
-packageWebapp.dependsOn npmInstall
+npmBuild.dependsOn npmInstall
+packageWebapp.dependsOn npmBuild
 assemble.dependsOn(packageWebapp)

@@ -1,4 +1,5 @@
-import FileBrowser from './file-browser.js'
+import './tree-view.js'
+
 //import BpmnViewer from 'https://unpkg.com/bpmn-js@3.4.3/lib/Viewer.js?module'
 import BpmnViewer from 'bpmn-js/lib/NavigatedViewer.js'
 import diff from './lib/differ.js'
@@ -474,49 +475,95 @@ function bfsSearchFile(files) {
   }
 }
 
+function recursiveWalk(node, callback) {
+  callback(node);
+  if ('children' in node) {
+    node.children.forEach(node => recursiveWalk(node, callback));
+  }
+}
+
+function diffToTree(diff) {
+  const cb = (node) => {
+    if ('type' in node) {
+      node.diffType = node.type; // TODO: Rename what comes from server
+      node.type = 'file'
+      node.hint = node.diffType;
+    }
+    else {
+      node.type = 'folder';
+    }
+
+    if ('leftName' in node) {
+      node.label = node.leftName;
+    }
+    else if ('rightName' in node) {
+      node.label = node.rightName;
+    }
+  };
+
+  diff.forEach(node => recursiveWalk(node, cb));
+
+  return diff;
+}
+
 function main() {
   fetch(`${BACKEND_URI}/diff`)
     .then(r => r.json())
     .then(diff => {
       if (Array.isArray(diff)) {
         // folder diff
-        customElements.whenDefined("a-file-browser")
+        customElements.whenDefined("tree-view")
           .then(_ => {
-            const fileBrowser = document.querySelector("a-file-browser");
+            const fileBrowser = document.querySelector("tree-view");
 
-            fileBrowser.addEventListener("file-selected", e => {
+            const tree = diffToTree(diff);
+            fileBrowser.data = tree;
+
+            fileBrowser.expandLeafsByCondition((node) => true)
+
+            fileBrowser.addEventListener("node-selected", e => {
               const diff = e.detail;
+
+              if (!diff.supported) {
+                getViewer('left').clear();
+                getViewer('right').clear();
+                alert("Is this a BPMN file? Can only diff BPMN files. ")
+                return;
+              }
 
               clearChangesOverview();
 
               versionDiv['left'].innerText = '-';
               versionDiv['right'].innerText = '-';
 
-              if (diff.type == "Modified") {
+              if (diff.diffType == "Modified") {
                 diffCommand = true;
               }
               else {
                 diffCommand = false;
               }
-              if (diff.type == "Removed" || diff.type == "Modified") {
+              if (diff.diffType == "Removed" || diff.diffType == "Modified") {
                 loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
               }
-              if (diff.type == "Added" || diff.type == "Modified") {
+              if (diff.diffType == "Added" || diff.diffType == "Modified") {
                 loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
               }
 
-              if (diff.type == "Removed") {
+              if (diff.diffType == "Removed") {
                 getViewer('right').clear();
               }
-              else if (diff.type == "Added") {
+              else if (diff.diffType == "Added") {
                 getViewer('left').clear();
               }
             });
 
-            fileBrowser.ls(diff);
-
+            /*fileBrowser.ls(diff);
+            */
             const foundFile = bfsSearchFile(diff);
-            if (foundFile) fileBrowser.select(foundFile);
+            if (foundFile) {
+              fileBrowser.select(foundFile);
+            }
+
           });
       }
       else {
