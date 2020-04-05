@@ -37,7 +37,7 @@ task copyFrontend(type: Copy) {
     include "**/*"
 }
 
-processResources.finalizedBy copyFrontend
+processResources.dependsOn copyFrontend
 
 group 'de.dplatz.bpmn-diff'
 version '999-SNAPSHOT'
