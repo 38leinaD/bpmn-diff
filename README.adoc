@@ -1,10 +1,10 @@
-= BPMN difftool for Git
+= A Git difftool for BPMN-files
 
 image::https://api.travis-ci.org/38leinaD/bpmn-diff.svg[]
 
 This tool is a repackaging of https://github.com/bpmn-io/bpmn-js-diffing (see here for the link:https://demo.bpmn.io/diff[online version])
 allowing it to be invoked from the commandline.
-Furthermore, this allows it to be used as a Git link:https://git-scm.com/docs/git-difftool[difftool].
+Due to this, it can be used as a link:https://git-scm.com/docs/git-difftool[difftool] for Git.
 
 image::https://s3.gifyu.com/images/bpmn-diff748dbead2328ed91.gif[]
 
@@ -27,7 +27,7 @@ java -jar bpmn-diff/build/libs/bpmn-diff.jar ./bpmn-diff-webapp/resources/pizza-
 
 A browser windows should open up showing the webapp. On close of the browser, the application should terminate.
 
-You cannot just diff files but whole folders.
+You can't just diff individual files but also perform a diff on a whole folders.
 
 === Usage as Git difftool
 
