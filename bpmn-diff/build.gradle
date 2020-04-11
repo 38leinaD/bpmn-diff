@@ -52,6 +52,13 @@ java {
 }
 
 
+task runApp(type: JavaExec) {
+	dependsOn build
+  	classpath = files('build/bpmn-diff-999-SNAPSHOT-runner.jar')
+
+  	args './src/test/resources/diffs/file-diff/a/flow.bpmn', './src/test/resources/diffs/file-diff/b/flow.bpmn'
+}
+
 test {
 //	jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
 }

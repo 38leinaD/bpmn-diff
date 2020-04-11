@@ -3,25 +3,19 @@ package de.dplatz.bpmndiff;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import de.dplatz.bpmndiff.boundary.JSONBConfiguration;
-import de.dplatz.bpmndiff.boundary.PathSerializer;
+import de.dplatz.bpmndiff.boundary.JsonbConfiguration;
 import de.dplatz.bpmndiff.control.Differ;
 import de.dplatz.bpmndiff.entity.Diff;
 import io.quarkus.test.common.http.TestHTTPResource;
@@ -38,7 +32,6 @@ public class FileDiffTest {
 	
 	@BeforeEach
 	public void init() throws URISyntaxException {
-	    System.out.println(">>> "+ url);
 		tut = ClientBuilder.newClient().target(url.toURI());
 	}
 	
@@ -56,11 +49,7 @@ public class FileDiffTest {
 		config.setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn").toAbsolutePath());
 		
 		// TODO: Is there a better way???
-		String responseBody = tut.request().get(String.class);
-		Jsonb jsonb = new JSONBConfiguration().getContext(null);
-		Diff diff = jsonb.fromJson(responseBody, Diff.class);
-		
-		//Diff diff = tut.request().get(Diff.class);
+		Diff diff = get(tut, Diff.class);
 		
 	    assertNotNull(diff.getId());
 
@@ -77,12 +66,16 @@ public class FileDiffTest {
 		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt").toAbsolutePath());
 		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt").toAbsolutePath());
 		
-		String responseBody = tut.request().get(String.class);
-        Jsonb jsonb = new JSONBConfiguration().getContext(null);
-        Diff diff = jsonb.fromJson(responseBody, Diff.class);	
+		Diff diff = get(tut, Diff.class);
         
 		assertNotNull(diff.getId());
 
 		assertEquals(false, diff.isSupported());
+	}
+	
+	private <T> T get(WebTarget target, Class<T> clazz) {
+	    String responseBody = tut.request().get(String.class);
+        Jsonb jsonb = new JsonbConfiguration().getContext(null);
+        return jsonb.fromJson(responseBody, clazz);
 	}
 }

@@ -97,9 +97,7 @@ public class DiffCommand implements Callable<Integer>, QuarkusApplication {
 			System.out.println("Please manually open '" + webappUri + "'.");
 			sharedConfig.exitOnBeacon(false);
 		}
-		
 		Quarkus.waitForExit();
-		System.out.println("Goodbye!");
 		
         return 0;
     }

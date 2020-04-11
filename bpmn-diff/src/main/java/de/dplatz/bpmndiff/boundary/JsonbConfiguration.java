@@ -11,11 +11,11 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class JSONBConfiguration implements ContextResolver<Jsonb> {
+public class JsonbConfiguration implements ContextResolver<Jsonb> {
 
     private Jsonb jsonb;
 
-    public JSONBConfiguration() {
+    public JsonbConfiguration() {
        JsonbConfig config = new JsonbConfig()
                .withFormatting(true)
                .withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {

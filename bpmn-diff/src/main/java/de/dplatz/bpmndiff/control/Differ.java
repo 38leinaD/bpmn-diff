@@ -36,7 +36,6 @@ public class Differ {
 	
 	public Object diff() throws IOException {
 		if (diffResult == null) {
-		    System.out.println(">>> PRINT " + config.getLeft());
 			diffResult = Diff.ofPaths(config.getLeft(), config.getRight());
 			if (Directory.class.isInstance(diffResult)) {
 				diffResult = Directory.class.cast(diffResult).getChildren();

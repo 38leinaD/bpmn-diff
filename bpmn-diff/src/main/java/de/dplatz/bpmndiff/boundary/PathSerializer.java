@@ -14,7 +14,6 @@ public class PathSerializer implements JsonbSerializer<Path>, JsonbDeserializer<
 
     @Override
     public void serialize(Path obj, JsonGenerator generator, SerializationContext ctx) {
-        System.out.println("XXX serialize");
        if (obj != null) {
          ctx.serialize(obj.toString(), generator);
        }
@@ -22,8 +21,6 @@ public class PathSerializer implements JsonbSerializer<Path>, JsonbDeserializer<
 
     @Override
     public Path deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        System.out.println("XXX deserialize");
-
         return Paths.get(parser.getString());
     }
 }
