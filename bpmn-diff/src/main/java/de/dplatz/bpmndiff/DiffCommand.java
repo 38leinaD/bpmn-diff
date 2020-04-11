@@ -3,6 +3,7 @@ package de.dplatz.bpmndiff;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Random;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -25,9 +26,9 @@ import picocli.CommandLine.Parameters;
 
 
 @QuarkusMain
-@Command(name = "ui", description = "...", mixinStandardHelpOptions = true)
-public class UICommand implements Callable<Integer>, QuarkusApplication {
-	Logger logger = LoggerFactory.getLogger(UICommand.class);
+@Command(name = "diff", description = "...", mixinStandardHelpOptions = true)
+public class DiffCommand implements Callable<Integer>, QuarkusApplication {
+	static Logger logger = LoggerFactory.getLogger(DiffCommand.class);
 
 	@Option(names = { "-b", "--browser" }, description = "Browser to use: ${COMPLETION-CANDIDATES}", showDefaultValue = Visibility.ALWAYS)
 	BrowserDetection.Strategy strategy = Strategy.BestFit;
@@ -47,7 +48,14 @@ public class UICommand implements Callable<Integer>, QuarkusApplication {
 
 	
     public static void main(String[] args) {
-        Quarkus.run(UICommand.class, args);
+        /*if (System.getProperty("quarkus.http.port") == null) {
+            int randomPort = new Random().nextInt(65535 - 1024) + 1024;
+            
+            logger.info("Using port {}", randomPort);
+            System.setProperty("quarkus.http.port", randomPort + "");
+        }
+        */
+        Quarkus.run(DiffCommand.class, args);
     }
 	
     @Override
@@ -90,19 +98,10 @@ public class UICommand implements Callable<Integer>, QuarkusApplication {
 			sharedConfig.exitOnBeacon(false);
 		}
 		
-		
-		try {
-			sharedConfig.exitLatch.await();
-		} catch (InterruptedException e) {
-			logger.error("Error while waiting on exit-latch", e);
-		}
-		
-		
-		//Quarkus.waitForExit();
+		Quarkus.waitForExit();
 		System.out.println("Goodbye!");
 		
-		
-        return 123;
+        return 0;
     }
     
 	/*

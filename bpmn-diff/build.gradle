@@ -51,6 +51,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+
+test {
+//	jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
+}
+
 /*
 buildNative {
     additionalBuildArgs = [

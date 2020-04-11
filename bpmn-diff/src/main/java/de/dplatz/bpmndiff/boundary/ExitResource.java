@@ -6,6 +6,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import de.dplatz.bpmndiff.SharedConfig;
+import io.quarkus.runtime.Quarkus;
 
 @Path("/exit")
 public class ExitResource {
@@ -17,8 +18,7 @@ public class ExitResource {
 	@Consumes("text/plain")
 	public void exit() {
 		if (config.shouldExitOnBeacon()) {
-			config.exitLatch.countDown();
-			System.out.println("EXIT REQUESTED BY BROWSER");
+		    Quarkus.asyncExit(0);
 		}
 	}
 }

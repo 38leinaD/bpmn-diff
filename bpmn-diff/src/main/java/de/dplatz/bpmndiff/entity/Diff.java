@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -24,6 +25,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class Diff extends Node {
 	
+    @JsonbTransient
 	Logger logger = LoggerFactory.getLogger(Diff.class);
 
 	
@@ -149,7 +151,7 @@ public class Diff extends Node {
 		return id;
 	}
 
-	public boolean isSupported() {
+    public boolean isSupported() {
 		return supported;
 	}
 }

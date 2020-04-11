@@ -1,18 +1,30 @@
 package de.dplatz.bpmndiff;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import de.dplatz.bpmndiff.boundary.JSONBConfiguration;
+import de.dplatz.bpmndiff.boundary.PathSerializer;
 import de.dplatz.bpmndiff.control.Differ;
 import de.dplatz.bpmndiff.entity.Diff;
+import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
@@ -20,9 +32,14 @@ public class FileDiffTest {
 
 	private WebTarget tut;
 
+	
+	@TestHTTPResource("/diff") 
+    URL url;
+	
 	@BeforeEach
-	public void init() {
-		tut = ClientBuilder.newClient().target("http://localhost:8081/diff");
+	public void init() throws URISyntaxException {
+	    System.out.println(">>> "+ url);
+		tut = ClientBuilder.newClient().target(url.toURI());
 	}
 	
 	@Inject
@@ -33,14 +50,20 @@ public class FileDiffTest {
 	
 	@Test
 	void should_diff_bpmn_files() {
-
 		// TODO
 		differ.reset();
-		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn"));
-		config.setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn"));
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn").toAbsolutePath());
+		config.setRight(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn").toAbsolutePath());
 		
-		Diff diff = tut.request().get(Diff.class);
+		// TODO: Is there a better way???
+		String responseBody = tut.request().get(String.class);
+		Jsonb jsonb = new JSONBConfiguration().getContext(null);
+		Diff diff = jsonb.fromJson(responseBody, Diff.class);
 		
+		//Diff diff = tut.request().get(Diff.class);
+		
+	    assertNotNull(diff.getId());
+
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/a/flow.bpmn").toAbsolutePath().normalize(), diff.getLeftPath());
 		assertEquals(Paths.get("./src/test/resources/diffs/file-diff/b/flow.bpmn").toAbsolutePath().normalize(), diff.getRightPath());
 		assertEquals(true, diff.isSupported());
@@ -51,11 +74,15 @@ public class FileDiffTest {
 	@Test
 	void should_should_not_support_text_files() {
 		differ.reset();
-		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt"));
-		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt"));
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/a/justtext.txt").toAbsolutePath());
+		config.setLeft(Paths.get("./src/test/resources/diffs/file-diff/b/justtext.txt").toAbsolutePath());
 		
-		Diff diff = tut.request().get(Diff.class);
-		
+		String responseBody = tut.request().get(String.class);
+        Jsonb jsonb = new JSONBConfiguration().getContext(null);
+        Diff diff = jsonb.fromJson(responseBody, Diff.class);	
+        
+		assertNotNull(diff.getId());
+
 		assertEquals(false, diff.isSupported());
 	}
 }
