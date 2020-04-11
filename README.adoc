@@ -1,33 +1,41 @@
 = A Git difftool for BPMN-files
 
-image::https://api.travis-ci.org/38leinaD/bpmn-diff.svg[]
+image::https://api.travis-ci.org/38leinaD/bpmn-diff.svg?style=flat-square[]
 
-This tool is a repackaging of https://github.com/bpmn-io/bpmn-js-diffing (see here for the link:https://demo.bpmn.io/diff[online version])
-allowing it to be invoked from the commandline.
-Due to this, it can be used as a link:https://git-scm.com/docs/git-difftool[difftool] for Git.
+`bpmn-diff` allows visual diffing of link:https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation[BPMN-files] from the commandline. It can also easily be integrated as a link:https://git-scm.com/docs/git-difftool[difftool for Git].
 
 image::https://s3.gifyu.com/images/bpmn-diff748dbead2328ed91.gif[]
 
+Note that this tool is possible in only possible due to the awesome link:https://github.com/bpmn-io/bpmn-js-diffing[bpmn-js-diffing] library (see here for the link:https://demo.bpmn.io/diff[online version]).
+At it's core, it is a repackaging/embeeded version of this library.
+
+The application-shell is based on link:https://quarkus.io/[Quarkus] and thus can also be built into a <<native-exe>> with link:https://www.graalvm.org/[GraalVM].
+
 == Usage
 
-For now, build the project locally:
+For now, the project needs to be built locally (requires Java 8 or above); 
 
 ----
 git clone https://github.com/38leinaD/bpmn-diff.git
 cd bpmn-diff
-./gradlew build
+./gradlew quarkusBuild --uber-jar
 ----
 
-
-You should now find the `bpmn-diff.jar` under `bpmn-diff/build/libs` and example BPMN files under `bpmn-diff-webapp/resources`. We can compare them with:
+You should find the `bpmn-diff-999-SNAPSHOT-runner.jar` under `bpmn-diff/build` and example BPMN files under `bpmn-diff-webapp/resources`. We can compare them with:
 
 ----
-java -jar bpmn-diff/build/libs/bpmn-diff.jar ./bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn ./bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
+java -jar bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar ./bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn ./bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
 ----
 
-A browser windows should open up showing the webapp. On close of the browser, the application should terminate.
+A browser window should open up showing the application. On close of the browser window, the application is terminated.
+As the application does not ship with it's own browser, it tries to find a browser on the local system.
+The steps, and how to set a specific browser, are outlined under <<browser-detection>>.
 
-You can't just diff individual files but also perform a diff on a whole folders.
+You cannot just diff individual files but also perform a diff on folders:
+
+----
+java -jar bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar ./bpmn-diff/src/test/resources/diffs/dir-diff/a ./bpmn-diff/src/test/resources/diffs/dir-diff/b
+----
 
 === Usage as Git difftool
 
@@ -35,13 +43,13 @@ Add the following to your `.gitconfig`
 
 ----
 [difftool "bpmn"]
-    cmd = java -jar <full-path-to-repo>/bpmn-diff/build/libs/bpmn-diff.jar $LOCAL $REMOTE
+    cmd = java -jar <full-path-to-repo>/bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar $LOCAL $REMOTE
     trustExitCode = false
 ----
 
 ==== Commands
 
-Assuming you have a Git repository with some BPMB-files, here are some useful commands:
+Assuming you have a Git repository with some BPMN-files, here are some useful commands:
 
 Diff on `flow.bpmn` between latest and previous commit:
 
@@ -58,7 +66,26 @@ git difftool --dir-diff -t bpmn HEAD~1 HEAD
 ----
 
 This will open a pane to switch between files.
+[[native-exe]]
+== Native Executable
 
+You either need to have GraalVM installed or Docker.
+
+If you have GraalVM installed and have set the `GRAALVM_HOME` environment variable, run:
+
+----
+./gradlew buildNative
+----
+
+This is the only option for Windows users and will require an installation of Visual Studio.
+
+If you are in a linux-based environment and have Docker installed, you may also build a native executable by running:
+
+----
+./gradlew buildNative --docker-build=true
+----
+
+[[browser-detection]]
 == Browser Detection
 
 The tool opens the difftool in a browser installed on your system. By default the `BestFit` strategy is used which will try to detect an appropriate browser in the following way:
