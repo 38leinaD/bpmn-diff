@@ -7,7 +7,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class Node implements Comparable<Node> {
 	private Path leftPath, rightPath;
-
+	private String leftName, rightName;
 	public Node() {
 		super();
 	}
@@ -16,6 +16,13 @@ public class Node implements Comparable<Node> {
 		super();
 		this.leftPath = left;
 		this.rightPath = right;
+		
+		if (this.leftPath != null) {
+		    leftName = leftPath.getFileName().toString();
+		}
+		if (this.rightPath != null) {
+		    rightName = rightPath.getFileName().toString();
+		}
 	}
 
 	public Path getLeftPath() {
@@ -25,17 +32,7 @@ public class Node implements Comparable<Node> {
 	public Path getRightPath() {
 		return rightPath;
 	}
-	
-	public String getLeftName() {
-		if (leftPath == null) return null;
-		return leftPath.getFileName().toString();
-	}
 
-	public String getRightName() {
-		if (rightPath == null) return null;
-		return rightPath.getFileName().toString();
-	}
-	
 	@Override
 	public int compareTo(Node o) {
 		return _getFileName().compareTo(o._getFileName());

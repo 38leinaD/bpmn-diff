@@ -56,7 +56,7 @@ task runApp(type: JavaExec) {
 	dependsOn build
   	classpath = files('build/bpmn-diff-999-SNAPSHOT-runner.jar')
 
-  	args './src/test/resources/diffs/file-diff/a/flow.bpmn', './src/test/resources/diffs/file-diff/b/flow.bpmn'
+  	args './src/test/resources/diffs/dir-diff/a', './src/test/resources/diffs/dir-diff/b'
 }
 
 test {
