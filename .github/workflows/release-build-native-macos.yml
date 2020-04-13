@@ -15,20 +15,10 @@ jobs:
       uses: DeLaGuardo/setup-graalvm@3
       with:
         graalvm-version: '19.3.1.java11'
-    - name: version
-      run: java -version
     - name: install native-image
       run: gu install native-image
     - name: Build Native
       run: gradle quarkusBuild -Dquarkus.package.type=native -Pversion="${{ github.event.release.tag_name }}"
-    - name: List
-      run: ls -l bpmn-diff/build
-    - name: List2
-      run: ls -l bpmn-diff
-    - name: List3
-      run: ls -l ./
-    - name: List4
-      run: find . -name "bpmn-diff*"
     - name: Upload Native Image (MacOS)
       id: upload-native-image-macos
       uses: actions/upload-release-asset@v1

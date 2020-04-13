@@ -14,29 +14,49 @@ The application-shell is based on link:https://quarkus.io/[Quarkus] and thus can
 
 == Usage
 
-For now, the project needs to be built locally (requires Java 8 or above); 
+Go to link:https://github.com/38leinaD/bpmn-diff/releases[Releases] and download the executable version if available for your environment. Currently, executables for Linux and MacOS are provided.
+For Windows, you will need to download and use the JAR-file (Java 8 or above needs to be installed).
+
+=== Usage of native executable
+
+Make sure that the file is executable:
 
 ----
-git clone https://github.com/38leinaD/bpmn-diff.git
-cd bpmn-diff
-./gradlew quarkusBuild --uber-jar
+chmod u+x bpmn-diff-0.0.1-linux
 ----
 
-You should find the `bpmn-diff-999-SNAPSHOT-runner.jar` under `bpmn-diff/build` and example BPMN files under `bpmn-diff-webapp/resources`. We can compare them with:
+If you have cloned this repo, you can find example BPMN files under `<repo>/bpmn-diff-webapp/resources`. We can compare them with:
 
 ----
-java -jar bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar ./bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn ./bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
+./bpmn-diff-0.0.1-linux <repo>/bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn <repo>/bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
 ----
-
-A browser window should open up showing the application. On close of the browser window, the application is terminated.
-As the application does not ship with it's own browser, it tries to find a browser on the local system.
-The steps, and how to set a specific browser, are outlined under <<browser-detection>>.
 
 You cannot just diff individual files but also perform a diff on folders:
 
 ----
-java -jar bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar ./bpmn-diff/src/test/resources/diffs/dir-diff/a ./bpmn-diff/src/test/resources/diffs/dir-diff/b
+./bpmn-diff-0.0.1-linux <repo>/bpmn-diff/src/test/resources/diffs/dir-diff/a <repo>/bpmn-diff/src/test/resources/diffs/dir-diff/b
 ----
+
+=== Usage of JAR
+
+Make sure that you have Java 8 or above installed by running:
+
+----
+java -version
+----
+
+If you have cloned this repo, you can find example BPMN files under `<repo>/bpmn-diff-webapp/resources`. We can compare them with:
+
+----
+java -jar bpmn-diff-0.0.1.jar <repo>/bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn <repo>/bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
+----
+
+You cannot just diff individual files but also perform a diff on folders:
+
+----
+java -jar bpmn-diff-0.0.1.jar <repo>/bpmn-diff/src/test/resources/diffs/dir-diff/a <repo>/bpmn-diff/src/test/resources/diffs/dir-diff/b
+----
+
 
 === Usage as Git difftool
 
@@ -44,7 +64,7 @@ Add the following to your `.gitconfig`
 
 ----
 [difftool "bpmn"]
-    cmd = java -jar <full-path-to-repo>/bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar $LOCAL $REMOTE
+    cmd = java -jar <full-path-to-repo>/bpmn-diff-0.0.1.jar $LOCAL $REMOTE
     trustExitCode = false
 ----
 
@@ -67,10 +87,39 @@ git difftool --dir-diff -t bpmn HEAD~1 HEAD
 ----
 
 This will open a pane to switch between files.
-[[native-exe]]
-== Native Executable
 
-You either need to have GraalVM installed or Docker.
+== Build
+
+To build the project you need Java 8 or above. 
+
+----
+git clone https://github.com/38leinaD/bpmn-diff.git
+cd bpmn-diff
+./gradlew quarkusBuild --uber-jar
+----
+
+The built `bpmn-diff-999-SNAPSHOT-runner.jar` is found under `bpmn-diff/build` .
+
+You can find example BPMN files under `bpmn-diff-webapp/resources`. We can compare them with:
+
+----
+java -jar bpmn-diff-999-SNAPSHOT.jar ./bpmn-diff-webapp/resources/pizza-collaboration/old.bpmn ./bpmn-diff-webapp/resources/pizza-collaboration/new.bpmn
+----
+
+A browser window should open up showing the application. On close of the browser window, the application is terminated.
+As the application does not ship with it's own browser, it tries to find a browser on the local system.
+The steps, and how to set a specific browser, are outlined under <<browser-detection>>.
+
+You cannot just diff individual files but also perform a diff on folders:
+
+----
+java -jar bpmn-diff/build/bpmn-diff-999-SNAPSHOT-runner.jar ./bpmn-diff/src/test/resources/diffs/dir-diff/a ./bpmn-diff/src/test/resources/diffs/dir-diff/b
+----
+
+[[native-exe]]
+=== Native Executable
+
+To build a native executable you either need to have GraalVM installed or Docker.
 
 If you have GraalVM installed and have set the `GRAALVM_HOME` environment variable, run:
 

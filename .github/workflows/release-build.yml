@@ -33,8 +33,6 @@ jobs:
         asset_content_type: application/octet-stream
     - name: Build Native
       run: gradle quarkusBuild -Dquarkus.package.type=native -Dquarkus.native.container-build=true -Pversion="${{ github.event.release.tag_name }}"
-    - name: List NATIVE
-      run: ls -l bpmn-diff/build
     - name: Upload Native Image (Linux)
       id: upload-native-image-linux
       uses: actions/upload-release-asset@v1
