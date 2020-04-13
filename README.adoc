@@ -1,7 +1,5 @@
-//image::https://api.travis-ci.org/38leinaD/bpmn-diff.svg?style=flat-square[]
-
-//https://img.shields.io/github/v/release/38leinaD/quarkus-with-gh-actions?style=for-the-badge
 image::https://img.shields.io/github/workflow/status/38leinaD/bpmn-diff/build?logo=GitHub&style=for-the-badge[]
+image::https://img.shields.io/github/v/release/38leinaD/bpmn-diff?style=for-the-badge&include_prereleases[]
 
 = A Git difftool for BPMN-files
 

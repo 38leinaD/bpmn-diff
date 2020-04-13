@@ -17,14 +17,9 @@ jobs:
         java-version: 11
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
-    - name: Build Native
-      run: gradle quarkusBuild --uber-jar buildNative -Pversion="${{ github.event.release.tag_name }}" -Dquarkus.native.container-build=true
-    - name: Publish to GitHub Packages
-      run: gradle publish
-      env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: List
+    - name: Build JVM JAR
+      run: gradle quarkusBuild --uber-jar -Pversion="${{ github.event.release.tag_name }}"
+    - name: List JAR
       run: ls -l bpmn-diff/build
     - name: Upload JVM JAR
       id: upload-jar
@@ -36,6 +31,10 @@ jobs:
         asset_path: ./bpmn-diff/build/bpmn-diff-${{ github.event.release.tag_name }}-runner.jar
         asset_name: bpmn-diff-${{ github.event.release.tag_name }}.jar
         asset_content_type: application/octet-stream
+    - name: Build Native
+      run: gradle quarkusBuild -Dquarkus.package.type=native -Dquarkus.native.container-build=true -Pversion="${{ github.event.release.tag_name }}"
+    - name: List NATIVE
+      run: ls -l bpmn-diff/build
     - name: Upload Native Image (Linux)
       id: upload-native-image-linux
       uses: actions/upload-release-asset@v1
