@@ -40,7 +40,6 @@ task copyFrontend(type: Copy) {
 processResources.dependsOn copyFrontend
 
 group 'de.dplatz.bpmn-diff'
-version '999-SNAPSHOT'
 
 compileJava {
     options.compilerArgs << '-parameters'
@@ -54,7 +53,7 @@ java {
 
 task runApp(type: JavaExec) {
 	dependsOn build
-  	classpath = files('build/bpmn-diff-999-SNAPSHOT-runner.jar')
+  	classpath = files("build/bpmn-diff-${version}-runner.jar")
 
   	args './src/test/resources/diffs/dir-diff/a', './src/test/resources/diffs/dir-diff/b'
 }
