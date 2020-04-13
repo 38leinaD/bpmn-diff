@@ -21,8 +21,10 @@ jobs:
       run: gu install native-image
     - name: Build Native
       run: gradle buildNative -Pversion="${{ github.event.release.tag_name }}"
+    - name: List
+      run: ls -l bpmn-diff/build
     - name: Upload Native Image (MacOS)
-      id: upload-release-asset 
+      id: upload-native-image-macos
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
