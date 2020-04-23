@@ -3,11 +3,11 @@ package de.dplatz.bpmndiff;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Random;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,8 @@ public class DiffCommand implements Callable<Integer>, QuarkusApplication {
 	@Parameters(arity = "2", paramLabel = "FILE", description = "File(s) to diff.")
 	private File[] inputFiles;
 
+	@ConfigProperty(name = "quarkus.http.port")
+	Integer assignedPort;
 	
 	@Inject
 	SharedConfig sharedConfig;
@@ -48,13 +50,6 @@ public class DiffCommand implements Callable<Integer>, QuarkusApplication {
 
 	
     public static void main(String[] args) {
-        /*if (System.getProperty("quarkus.http.port") == null) {
-            int randomPort = new Random().nextInt(65535 - 1024) + 1024;
-            
-            logger.info("Using port {}", randomPort);
-            System.setProperty("quarkus.http.port", randomPort + "");
-        }
-        */
         Quarkus.run(DiffCommand.class, args);
     }
 	
@@ -84,9 +79,9 @@ public class DiffCommand implements Callable<Integer>, QuarkusApplication {
 			logger.error("Error while diffing.", e);
 			return -1;
 		}
-		
+
 		//URI webappUri = resolveWebapp(server);
-		URI webappUri = new URI("http://localhost:8080/index.html");
+		URI webappUri = new URI("http://localhost:" + assignedPort + "/index.html");
 		
 		if (openBrowser) {
 			if (!strategy.open(webappUri)) {
