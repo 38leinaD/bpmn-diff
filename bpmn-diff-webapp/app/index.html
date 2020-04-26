@@ -26,31 +26,32 @@
 <body>
 
 	<main>
-		<nav>
-			<tree-view></tree-view>
-		</nav>
-		<article>
-			<div class="di-container left drop-zone" target="left">
+		<vaadin-split-layout>
+			<nav>
+				<tree-view></tree-view>
+			</nav>
+			<article>
+				<div class="di-container left drop-zone" target="left">
 
-				<div class="io-control di-header">
-					<h2 id="versionLeft">-</h2>
-					<input class="file" type="file" target="left">
+					<div class="io-control di-header">
+						<h2 id="versionLeft">-</h2>
+						<input class="file" type="file" target="left">
+					</div>
+
+					<div class="canvas" id="canvas-left"></div>
 				</div>
 
-				<div class="canvas" id="canvas-left"></div>
-			</div>
+				<div class="di-container right drop-zone" target="right">
+					<div class="io-control di-header">
+						<h2 id="versionRight">-</h2>
+						<input class="file" type="file" target="right">
+					</div>
 
-			<div class="di-container right drop-zone" target="right">
-				<div class="io-control di-header">
-					<h2 id="versionRight">-</h2>
-					<input class="file" type="file" target="right">
+					<div class="canvas" id="canvas-right"></div>
 				</div>
-
-				<div class="canvas" id="canvas-right"></div>
-			</div>
-		</article>
+			</article>
 	</main>
-
+	</vaadin-split-layout>
 	<div id="changes-overview" class="collapsed">
 		<div class="io-control show-hide-toggle">List of Changes</div>
 		<div class="io-control changes"></div>

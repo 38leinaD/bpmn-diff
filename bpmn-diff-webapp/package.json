@@ -21,7 +21,8 @@
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "bpmn-js": "^3.4.1",
     "jsondiffpatch": "^0.3.11",
-    "lit-element": "^2.3.1"
+    "lit-element": "^2.3.1",
+    "@vaadin/vaadin-split-layout": "^4.1.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.3",

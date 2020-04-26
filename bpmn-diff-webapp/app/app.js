@@ -3,6 +3,7 @@ import './tree-view.js'
 //import BpmnViewer from 'https://unpkg.com/bpmn-js@3.4.3/lib/Viewer.js?module'
 import BpmnViewer from 'bpmn-js/lib/NavigatedViewer.js'
 import diff from './lib/differ.js'
+import '@vaadin/vaadin-split-layout'
 
 const BACKEND_URI = (location.host === 'localhost:3000' && window.cy === undefined) ? 'http://localhost:8080' : '..';
 const versionDiv = {
@@ -571,7 +572,7 @@ function main() {
         loadDiagram('left', { url: `${BACKEND_URI}/diff/${diff.id}/left`, file: diff.leftName });
         loadDiagram('right', { url: `${BACKEND_URI}/diff/${diff.id}/right`, file: diff.rightName });
 
-        document.querySelector('main').classList.add('collapsedNav');
+        document.querySelector('nav').remove();
       }
     });
 
