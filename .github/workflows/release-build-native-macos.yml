@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
+    - name: Set up GraalVM
       uses: DeLaGuardo/setup-graalvm@3
       with:
-        graalvm-version: '19.3.1.java11'
+        graalvm-version: '20.0.0.java11'
     - name: install native-image
       run: gu install native-image
     - name: Build Native
