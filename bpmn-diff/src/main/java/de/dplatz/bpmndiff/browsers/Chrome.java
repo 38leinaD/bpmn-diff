@@ -1,5 +1,6 @@
 package de.dplatz.bpmndiff.browsers;
 
+import java.io.File;
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -28,7 +29,20 @@ public class Chrome extends Browser {
     			return runExecutable(cmd);
     		}
 		}
+		
+		if (isWindows()) {
+		    File chromeExe = new File("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe");
+		    if (chromeExe.exists() && chromeExe.canExecute()) {
+		        String cmd = chromeExe + " --incognito --app=" + uri.toString();
+                logger.debug("Present! Running '" + cmd + "'.");
+                return runExecutable(cmd);
+		    }
+		}
 		return false;
+	}
+	
+	private boolean isWindows() {
+	    return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
 
 }
