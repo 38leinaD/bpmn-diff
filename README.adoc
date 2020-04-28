@@ -7,8 +7,8 @@ image::https://img.shields.io/github/v/release/38leinaD/bpmn-diff?style=for-the-
 
 image::https://s3.gifyu.com/images/bpmn-diff748dbead2328ed91.gif[]
 
-Note that this tool is possible in only possible due to the awesome link:https://github.com/bpmn-io/bpmn-js-diffing[bpmn-js-diffing] library (see here for the link:https://demo.bpmn.io/diff[online version]).
-At it's core, it is a repackaging/embeeded version of this library.
+Note that this tool is only possible due to the awesome link:https://github.com/bpmn-io/bpmn-js-diffing[bpmn-js-diffing] library (see here for the link:https://demo.bpmn.io/diff[online version]).
+At it's core, this is a repackaging/embeeded version of the library.
 
 The application-shell is based on link:https://quarkus.io/[Quarkus] and thus can also be built into a <<native-exe>> with link:https://www.graalvm.org/[GraalVM].
 
