@@ -19,8 +19,9 @@ public class Chrome extends Browser {
 	
 	@Override
 	public boolean open(URI uri) {
-		logger.debug("Checking for 'google-chrome' executable...");
 		for (String exe : CHROME_EXECUTABLES) {
+		    logger.debug("Checking for '" + exe + "' executable...");
+
     		if (envPath.isExecutableOnPath(exe)) {
     			String cmd = "google-chrome --incognito --app=" + uri.toString();
     			logger.debug("Present! Running '" + cmd + "'.");
