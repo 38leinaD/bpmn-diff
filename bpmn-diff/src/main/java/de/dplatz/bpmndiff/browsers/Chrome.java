@@ -9,6 +9,8 @@ public class Chrome extends Browser {
 
 	Logger logger = LoggerFactory.getLogger(Chrome.class);
 
+	private static final String[] CHROME_EXECUTABLES = { "google-chrome", "google" };
+	
 	private EnvPath envPath;
 
 	public Chrome(EnvPath envPath) {
@@ -18,14 +20,14 @@ public class Chrome extends Browser {
 	@Override
 	public boolean open(URI uri) {
 		logger.debug("Checking for 'google-chrome' executable...");
-		if (envPath.isExecutableOnPath("google-chrome")) {
-			String cmd = "google-chrome --incognito --app=" + uri.toString();
-			logger.debug("Present! Running '" + cmd + "'.");
-			return runExecutable(cmd);
+		for (String exe : CHROME_EXECUTABLES) {
+    		if (envPath.isExecutableOnPath(exe)) {
+    			String cmd = "google-chrome --incognito --app=" + uri.toString();
+    			logger.debug("Present! Running '" + cmd + "'.");
+    			return runExecutable(cmd);
+    		}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 }
