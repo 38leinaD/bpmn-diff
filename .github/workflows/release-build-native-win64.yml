@@ -19,11 +19,11 @@ jobs:
       run: |
         %JAVA_HOME%/bin/gu.cmd install native-image
       shell: cmd
-    - name: SetPageFile
+    - name: Set PageFile size
+      # See https://github.com/actions/virtual-environments/issues/785
       run: |
-        Invoke-WebRequest http://www.paraglidernc.com/Files/SetPageFile1008.cab -OutFile SetPageFile1008.cab
-        expand.exe SetPageFile1008.cab -F:* C:\
-        C:\files\SetPageFile.exe /f D:\pagefile.sys /m 8192
+        Invoke-Expression ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/al-cheb/PageFile/master/SetPageFileSize.ps1'))
+      shell: powershell
     - name: Build Native
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64

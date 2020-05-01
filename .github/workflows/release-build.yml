@@ -19,8 +19,6 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Build JVM JAR
       run: gradle quarkusBuild --uber-jar -Pversion="${{ github.event.release.tag_name }}"
-    - name: List JAR
-      run: ls -l bpmn-diff/build
     - name: Upload JVM JAR
       id: upload-jar
       uses: actions/upload-release-asset@v1

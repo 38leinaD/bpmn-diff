@@ -14,8 +14,7 @@ The application-shell is based on link:https://quarkus.io/[Quarkus] and thus can
 
 == Usage
 
-Go to link:https://github.com/38leinaD/bpmn-diff/releases[Releases] and download the executable version if available for your environment. Currently, executables for Linux and MacOS are provided.
-For Windows, you will need to download and use the JAR-file (Java 8 or above needs to be installed).
+Go to link:https://github.com/38leinaD/bpmn-diff/releases[Releases] and download the executable version for your environment (Linux, Mac or Windows). 
 
 === Usage of native executable
 
