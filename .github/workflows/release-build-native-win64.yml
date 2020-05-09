@@ -21,9 +21,8 @@ jobs:
       shell: cmd
     - name: Set PageFile size
       # See https://github.com/actions/virtual-environments/issues/785
-      run: |
-        Invoke-Expression ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/al-cheb/PageFile/master/SetPageFileSize.ps1'))
-      shell: powershell
+    - name: configure Pagefile
+      uses: al-cheb/configure-pagefile-action@v1.2
     - name: Build Native
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
