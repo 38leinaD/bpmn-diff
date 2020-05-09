@@ -19,7 +19,6 @@ jobs:
       run: |
         %JAVA_HOME%/bin/gu.cmd install native-image
       shell: cmd
-    - name: Set PageFile size
       # See https://github.com/actions/virtual-environments/issues/785
     - name: configure Pagefile
       uses: al-cheb/configure-pagefile-action@v1.2
