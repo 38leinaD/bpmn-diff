@@ -16,9 +16,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-resteasy-jsonb'
 	implementation 'io.quarkus:quarkus-rest-client'
-
-	implementation 'info.picocli:picocli:4.2.0'
-	annotationProcessor 'info.picocli:picocli-codegen:4.2.0'
+    implementation 'io.quarkus:quarkus-picocli'
 	
     testImplementation 'io.quarkus:quarkus-junit5'
 
