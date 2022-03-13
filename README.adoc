@@ -5,8 +5,8 @@ image::https://img.shields.io/github/v/release/38leinaD/bpmn-diff?style=for-the-
 
 `bpmn-diff` allows visual diffing of link:https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation[BPMN-files] from the commandline. It can also easily be integrated as a link:https://git-scm.com/docs/git-difftool[difftool for Git].
 
-image::https://s3.gifyu.com/images/bpmn-diff748dbead2328ed91.gif[]
-https://github.com/38leinaD/bpmn-diff/raw/master/media/preview.gif
+image::https://github.com/38leinaD/bpmn-diff/raw/master/media/preview.gif[]
+
 Note that this tool is only possible due to the awesome link:https://github.com/bpmn-io/bpmn-js-diffing[bpmn-js-diffing] library (see here for the link:https://demo.bpmn.io/diff[online version]).
 At it's core, this is a repackaging/embeeded version of the library.
 
