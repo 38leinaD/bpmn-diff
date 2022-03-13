@@ -25,6 +25,7 @@ public class EnvPath {
 
 	public boolean isExecutableOnPath(String exe) {
 		return path.stream()
+				.filter(p -> p.toFile().exists() && p.toFile().isDirectory())
 				.filter(p -> this.isExecutableInDir(p, exe))
 				.findAny()
 				.isPresent();

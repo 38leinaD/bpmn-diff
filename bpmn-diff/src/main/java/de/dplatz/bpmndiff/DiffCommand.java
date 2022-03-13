@@ -70,8 +70,8 @@ public class DiffCommand implements Callable<Integer>, QuarkusApplication {
 			if (diff instanceof Diff) {
 				Diff fileDiff = Diff.class.cast(diff);
 				if (!fileDiff.isSupported()) {
-					logger.info(String.format("File-diff on unsupported file %s. Exiting.", fileDiff.toString()));
-					System.exit(-1);
+					logger.error(String.format("File-diff on unsupported file %s. Exiting.", fileDiff.toString()));
+					return -1;
 				}
 			}
 			
