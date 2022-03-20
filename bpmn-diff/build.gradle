@@ -40,7 +40,12 @@ processResources.dependsOn copyFrontend
 group 'de.dplatz.bpmn-diff'
 
 compileJava {
+    options.encoding = 'UTF-8'
     options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
 }
 
 java {
