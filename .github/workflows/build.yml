@@ -3,12 +3,12 @@ name: build
 on:
   push:
     branches:
-    - master,
+    - master
     - 'feature/**'
     
   pull_request:
     branches:
-    - master,
+    - master
     - 'feature/**'
   workflow_dispatch:
 
