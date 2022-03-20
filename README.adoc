@@ -38,7 +38,7 @@ You cannot just diff individual files but also perform a diff on folders:
 
 === Usage of JAR
 
-Make sure that you have Java 8 or above installed by running:
+Make sure that you have Java 11 or above installed by running:
 
 ----
 java -version
