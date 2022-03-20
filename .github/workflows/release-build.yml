@@ -18,7 +18,7 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Build JVM JAR
-      run: gradle quarkusBuild --uber-jar -Pversion="${{ github.event.release.tag_name }}"
+      run: gradle quarkusBuild -Dquarkus.package.type=uber-jar -Pversion="${{ github.event.release.tag_name }}"
     - name: Upload JVM JAR
       id: upload-jar
       uses: actions/upload-release-asset@v1
