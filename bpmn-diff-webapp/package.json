@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.3",
-    "cypress": "^3.3.1",
+    "cypress": "^12.7.0",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.5.1"
